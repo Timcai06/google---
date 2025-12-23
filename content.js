@@ -1,64 +1,109 @@
-// 翻译API配置 - 使用免费的翻译服务
+/**
+ * 单词翻译助手 - 内容脚本
+ *
+ * 主要功能：
+ * 1. 在网页中注入翻译功能和UI组件
+ * 2. 处理文本选择和翻译请求
+ * 3. 高亮显示已翻译的单词
+ * 4. 管理翻译缓存和用户交互
+ * 5. 与后台服务进程通信获取翻译结果
+ */
+
+// ====================
+// 配置常量定义
+// ====================
+
+// 翻译API配置 - 使用免费的翻译服务作为备用方案
 const TRANSLATE_API = 'https://api.mymemory.translated.net/get';
-// 音标API配置 - 使用免费的字典服务
+// 音标API配置 - 使用免费的字典服务获取单词音标和词性
 const DICTIONARY_API = 'https://api.dictionaryapi.dev/api/v2/entries/en/';
 
-// 存储选中的文本
+// ====================
+// 全局变量定义
+// ====================
+
+// 存储用户选中的文本内容
 let selectedText = '';
+// 存储用户选中的文本范围对象，用于后续操作
 let selectedRange = null;
+// 翻译弹出窗口DOM元素
 let translationPopup = null;
+// 点击提示工具条DOM元素
 let clickTooltip = null;
 
-// 缓存
+// ====================
+// 缓存系统
+// ====================
+
+// 翻译结果缓存 - 避免重复翻译相同文本
 const translationCache = new Map();
+// 音标信息缓存 - 避免重复查询单词音标
 const phoneticCache = new Map();
 
+// ====================
 // 防抖定时器
+// ====================
+
+// 高亮显示的防抖定时器 - 防止频繁触发高亮更新
 let highlightDebounceTimer = null;
+// 文本选择的防抖定时器 - 防止频繁触发翻译请求
 let selectionDebounceTimer = null;
 
-// 初始化：加载已翻译的单词并高亮显示
+/**
+ * 初始化高亮功能
+ * 页面加载时自动加载已翻译的单词并进行高亮显示
+ */
 async function initHighlighting() {
+  // 从Chrome本地存储中获取已翻译的单词数据
   const result = await chrome.storage.local.get(['translatedWords']);
   const words = result.translatedWords || {};
-  
-  // 高亮显示已翻译的单词
+
+  // 对已翻译的单词进行高亮显示
   highlightTranslatedWords(words);
 }
 
-// 高亮显示已翻译的单词（只高亮单词和词组）
+/**
+ * 高亮显示已翻译的单词
+ * 只对单词和词组类型进行高亮，句子类型不进行高亮
+ *
+ * @param {Object} words - 已翻译的单词对象，键为单词，值为翻译数据
+ */
 function highlightTranslatedWords(words) {
   const body = document.body;
   if (!body) return;
-  
-  // 移除之前的高亮
+
+  // 移除之前的所有高亮元素，防止重复高亮
   const existingHighlights = document.querySelectorAll('.translated-word-highlight');
   existingHighlights.forEach(el => {
     const parent = el.parentNode;
+    // 将高亮元素替换为纯文本节点
     parent.replaceChild(document.createTextNode(el.textContent), el);
-    parent.normalize();
+    parent.normalize(); // 合并相邻的文本节点
   });
-  
-  // 只处理单词和词组类型
+
+  // 只处理单词和词组类型的翻译记录
   const wordKeys = Object.keys(words).filter(word => {
     const wordData = words[word];
     return wordData.type === 'word' || wordData.type === 'phrase';
   });
-  
-  // 为每个已翻译的单词创建高亮
+
+  // 为每个已翻译的单词创建高亮显示
   wordKeys.forEach(word => {
     const wordLower = word.toLowerCase();
     const wordData = words[word];
-    const posClass = getPartOfSpeechClass(wordData.partOfSpeech || '');
+    // 为词组使用特殊的词性样式类
+    const posClass = wordData.type === 'phrase' ? 'pos-phrase' : getPartOfSpeechClass(wordData.partOfSpeech || '');
+    // 创建区分大小写的正则表达式，用于精确匹配单词边界
     const regex = new RegExp(`\\b${escapeRegExp(wordLower)}\\b`, 'gi');
-    
+
+    // 遍历页面中的所有文本节点
     walkTextNodes(body, (node) => {
-      // 跳过已经高亮的节点或其父节点
+      // 跳过已经高亮的节点或其父节点，避免重复处理
       if (node.parentElement && node.parentElement.classList.contains('translated-word-highlight')) {
         return;
       }
-      
-      // 跳过高亮元素内的文本节点
+
+      // 跳过高亮元素内部的文本节点
       let parent = node.parentElement;
       while (parent && parent !== body) {
         if (parent.classList && parent.classList.contains('translated-word-highlight')) {
@@ -66,85 +111,115 @@ function highlightTranslatedWords(words) {
         }
         parent = parent.parentElement;
       }
-      
+
+      // 处理文本节点中的单词匹配
       if (node.nodeType === Node.TEXT_NODE && node.textContent.match(regex)) {
         const fragment = document.createDocumentFragment();
         let lastIndex = 0;
         let match;
         const text = node.textContent;
-        
+
+        // 循环处理所有匹配的单词
         while ((match = regex.exec(text)) !== null) {
           // 添加匹配前的文本
           if (match.index > lastIndex) {
             fragment.appendChild(document.createTextNode(text.substring(lastIndex, match.index)));
           }
-          
-          // 创建高亮元素
+
+          // 创建高亮显示的span元素
           const highlight = document.createElement('span');
           highlight.className = `translated-word-highlight ${posClass}`;
           highlight.textContent = match[0];
+          // 存储单词相关数据作为元素属性
           highlight.dataset.word = wordLower;
           highlight.dataset.translation = words[word].translation;
           highlight.dataset.count = words[word].count;
           if (wordData.partOfSpeech) {
             highlight.dataset.partOfSpeech = wordData.partOfSpeech;
           }
-          
-          // 添加点击事件
+
+          // 为高亮元素添加点击事件监听器
           highlight.addEventListener('click', handleHighlightClick);
-          
+
           fragment.appendChild(highlight);
-          
+
           lastIndex = regex.lastIndex;
         }
-        
-        // 添加剩余的文本
+
+        // 添加剩余的文本内容
         if (lastIndex < text.length) {
           fragment.appendChild(document.createTextNode(text.substring(lastIndex)));
         }
-        
+
+        // 用处理后的片段替换原始文本节点
         node.parentNode.replaceChild(fragment, node);
       }
     });
   });
 }
 
-// 转义正则表达式特殊字符
+/**
+ * 转义正则表达式特殊字符
+ * 防止用户输入的文本影响正则表达式的正常工作
+ *
+ * @param {string} string - 需要转义的字符串
+ * @returns {string} 转义后的字符串
+ */
 function escapeRegExp(string) {
   return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
-// 判断是否为单词或词组（只包含字母、空格、连字符、撇号）
+/**
+ * 判断文本是否为单词或词组
+ * 只包含字母、空格、连字符、撇号的文本被认为是单词或词组
+ *
+ * @param {string} text - 要判断的文本
+ * @returns {boolean} 是否为单词或词组
+ */
 function isWordOrPhrase(text) {
   const trimmed = text.trim();
   if (trimmed.length === 0) return false;
-  
+
   // 只包含字母、空格、连字符、撇号的文本被认为是单词或词组
   // 且不能是纯空格
   const wordPattern = /^[a-zA-Z\s\-']+$/;
   return wordPattern.test(trimmed) && trimmed.replace(/\s/g, '').length > 0;
 }
 
-// 遍历文本节点
+/**
+ * 递归遍历DOM树中的所有文本节点
+ * 对每个文本节点执行回调函数
+ *
+ * @param {Node} node - 要遍历的DOM节点
+ * @param {Function} callback - 对每个文本节点执行的回调函数
+ */
 function walkTextNodes(node, callback) {
   if (node.nodeType === Node.TEXT_NODE) {
+    // 如果是文本节点，直接执行回调
     callback(node);
   } else {
+    // 如果是元素节点，递归遍历其子节点
     const children = Array.from(node.childNodes);
     children.forEach(child => walkTextNodes(child, callback));
   }
 }
 
-// 翻译文本（带缓存，优先使用有道，失败时回退到 MyMemory）
+/**
+ * 翻译文本内容
+ * 带缓存功能，优先使用有道翻译，失败时回退到MyMemory翻译服务
+ *
+ * @param {string} text - 要翻译的文本
+ * @returns {Promise<Object>} 翻译结果对象
+ */
 async function translateText(text) {
   const cacheKey = text.toLowerCase().trim();
-  
-  // 检查缓存
+
+  // 检查翻译缓存
   if (translationCache.has(cacheKey)) {
     return translationCache.get(cacheKey);
   }
-  
-  // 1. 优先尝试使用 background.js 中的有道翻译
+
+  // 1. 优先尝试使用background.js中的有道翻译服务
   try {
     const youdaoResp = await chrome.runtime.sendMessage({
       type: 'YOUDAO_TRANSLATE',
@@ -180,34 +255,41 @@ async function translateText(text) {
   }
 }
 
-// 获取单词音标和词性（带缓存）
+/**
+ * 获取单词的音标和词性信息
+ * 使用Dictionary API获取单词的发音和词性分类
+ *
+ * @param {string} word - 要查询的单词
+ * @returns {Promise<Object>} 包含音标和词性的对象
+ */
 async function getPhoneticAndPartOfSpeech(word) {
   const cacheKey = word.toLowerCase().trim();
-  
-  // 检查缓存
+
+  // 检查音标缓存，避免重复API调用
   if (phoneticCache.has(cacheKey)) {
     return phoneticCache.get(cacheKey);
   }
-  
+
   try {
+    // 调用Dictionary API获取单词详细信息
     const response = await fetch(`${DICTIONARY_API}${encodeURIComponent(word)}`);
     const data = await response.json();
-    
+
     let result = { phonetic: null, partOfSpeech: null };
-    
+
     if (Array.isArray(data) && data.length > 0) {
       const entry = data[0];
-      
-      // 获取音标
+
+      // 提取音标信息（优先使用phonetic字段，否则从phonetics数组中查找）
       result.phonetic = entry.phonetic || entry.phonetics?.find(p => p.text)?.text;
-      
-      // 获取词性（通常在第一 meanings 的第一个 definition 中）
+
+      // 提取词性信息（从第一个释义中获取）
       if (entry.meanings && entry.meanings.length > 0) {
         result.partOfSpeech = entry.meanings[0].partOfSpeech || null;
       }
     }
-    
-    // 缓存结果（包括null）
+
+    // 缓存结果（包括null值）
     phoneticCache.set(cacheKey, result);
     return result;
   } catch (error) {
@@ -218,41 +300,52 @@ async function getPhoneticAndPartOfSpeech(word) {
   }
 }
 
-// 获取单词音标（兼容旧代码）
+/**
+ * 获取单词音标（兼容旧代码的接口）
+ * 为了保持向后兼容性，提供单独的音标获取函数
+ *
+ * @param {string} word - 要查询的单词
+ * @returns {Promise<string|null>} 单词的音标字符串或null
+ */
 async function getPhonetic(word) {
   const result = await getPhoneticAndPartOfSpeech(word);
   return result.phonetic;
 }
 
-// 处理高亮单词点击
+/**
+ * 处理高亮单词的点击事件
+ * 显示单词的详细信息工具提示，包括翻译、音标、词性等
+ *
+ * @param {Event} e - 点击事件对象
+ */
 async function handleHighlightClick(e) {
-  e.stopPropagation(); // 阻止事件冒泡
+  e.stopPropagation(); // 阻止事件冒泡，避免触发其他点击事件
   e.preventDefault(); // 阻止默认行为
-  
+
   const highlight = e.target;
   const word = highlight.dataset.word;
   const translation = highlight.dataset.translation;
-  
-  // 增加翻译次数
+
+  // 更新单词的使用统计信息
   const result = await chrome.storage.local.get(['translatedWords']);
   const words = result.translatedWords || {};
   const wordLower = word.toLowerCase();
-  
+
   if (words[wordLower]) {
-    // 增加计数
+    // 增加单词的使用计数
     words[wordLower].count += 1;
     words[wordLower].lastUsed = new Date().toISOString();
     await chrome.storage.local.set({ translatedWords: words });
-    
-    // 获取更新后的计数
+
+    // 获取更新后的使用次数
     const updatedCount = words[wordLower].count;
-    
-    // 优先从存储中获取词性，如果没有则从API获取
+
+    // 获取词性信息（优先从存储中获取）
     let partOfSpeech = words[wordLower].partOfSpeech || highlight.dataset.partOfSpeech;
-    
-    // 获取音标和词性（如果还没有缓存）
+
+    // 获取音标信息（如果还没有缓存）
     let phonetic = highlight.dataset.phonetic;
-    
+
     if (!phonetic || (!partOfSpeech && !highlight.dataset.partOfSpeech)) {
       const phoneticData = await getPhoneticAndPartOfSpeech(word);
       if (phoneticData.phonetic) {
@@ -262,20 +355,20 @@ async function handleHighlightClick(e) {
       if (phoneticData.partOfSpeech) {
         partOfSpeech = phoneticData.partOfSpeech;
         highlight.dataset.partOfSpeech = partOfSpeech;
-        // 更新存储中的词性
+        // 更新存储中的词性信息
         words[wordLower].partOfSpeech = partOfSpeech;
         await chrome.storage.local.set({ translatedWords: words });
       }
     }
-    
-    // 如果存储中有词性但dataset中没有，更新dataset
+
+    // 如果存储中有词性但元素属性中没有，同步更新元素属性
     if (words[wordLower].partOfSpeech && !highlight.dataset.partOfSpeech) {
       partOfSpeech = words[wordLower].partOfSpeech;
       highlight.dataset.partOfSpeech = partOfSpeech;
     }
     
     // 先显示提示框（使用当前元素位置，避免重新高亮后位置变化）
-    showClickTooltip(highlight, word, translation, updatedCount, phonetic, partOfSpeech);
+    showClickTooltip(highlight, word, translation, updatedCount, phonetic, partOfSpeech, words[wordLower].type);
     
     // 然后重新高亮显示以更新所有高亮元素的计数和dataset
     // 使用延迟确保提示框已经显示
@@ -286,14 +379,15 @@ async function handleHighlightClick(e) {
 }
 
 // 显示点击提示框
-function showClickTooltip(element, word, translation, count, phonetic, partOfSpeech) {
+function showClickTooltip(element, word, translation, count, phonetic, partOfSpeech, wordType = 'word') {
   // 移除旧的提示
   if (clickTooltip) {
     clickTooltip.remove();
   }
   
   // 根据词性获取背景颜色类
-  const posClass = getPartOfSpeechClass(partOfSpeech);
+  // 词组使用特殊的词性类
+  const posClass = wordType === 'phrase' ? 'pos-phrase' : getPartOfSpeechClass(partOfSpeech);
   
   // 创建新提示
   clickTooltip = document.createElement('div');
@@ -511,7 +605,9 @@ async function showTranslationPopup(text, translation, x, y, count = 1) {
   };
   
   // 根据词性获取背景颜色类
-  const posClass = getPartOfSpeechClass(partOfSpeech);
+  // 词组使用特殊的词性类
+  const type = isWordPhrase ? (text.trim().split(/\s+/).length === 1 ? 'word' : 'phrase') : 'sentence';
+  const posClass = type === 'phrase' ? 'pos-phrase' : getPartOfSpeechClass(partOfSpeech);
   
   // 使用与点击高亮单词相同的提示框样式
   clickTooltip = document.createElement('div');
@@ -789,4 +885,3 @@ observer.observe(document.body, {
   childList: false,
   subtree: false
 });
-
