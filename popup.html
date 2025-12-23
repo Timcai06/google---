@@ -1,52 +1,82 @@
 <!DOCTYPE html>
+<!-- 单词翻译助手 - 弹出页面HTML结构 -->
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
+  <!-- 响应式设计视口设置 -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- 页面标题 -->
   <title>翻译记录</title>
+  <!-- 引入样式文件 -->
   <link rel="stylesheet" href="popup.css">
 </head>
 <body>
+  <!-- 主容器 - 包含所有页面内容 -->
   <div class="container">
-    <!-- Home Page -->
+    <!-- 首页 - 显示翻译统计和分类导航 -->
     <div id="homePage" class="page active">
+      <!-- 页面头部 -->
       <header class="header">
         <h1>📚 翻译记录</h1>
+        <!-- 统计信息显示区域 -->
         <div class="stats">
-          <span id="totalWords">0</span> 个单词
+          <span id="totalWords">0</span> 个翻译记录
         </div>
       </header>
-      
+
+      <!-- 首页内容区域 - 左右两列布局 -->
       <div class="home-content">
-        <div class="home-card" data-page="word">
-          <div class="card-icon">📝</div>
-          <div class="card-title">单词</div>
-          <div class="card-count" id="wordCount">0</div>
+        <!-- 左侧统计面板 -->
+        <div class="stats-panel">
+          <!-- 单词统计卡片 -->
+          <div class="stat-card" data-page="word">
+            <div class="stat-icon">📝</div>
+            <div class="stat-title">单词</div>
+            <div class="stat-count" id="wordCount">0</div>
+          </div>
+
+          <!-- 词组统计卡片 -->
+          <div class="stat-card" data-page="phrase">
+            <div class="stat-icon">📄</div>
+            <div class="stat-title">词组</div>
+            <div class="stat-count" id="phraseCount">0</div>
+          </div>
+
+          <!-- 句子统计卡片 -->
+          <div class="stat-card" data-page="sentence">
+            <div class="stat-icon">💬</div>
+            <div class="stat-title">句子</div>
+            <div class="stat-count" id="sentenceCount">0</div>
+          </div>
+
+          <!-- 星标单词统计卡片 -->
+          <div class="stat-card" data-page="starred">
+            <div class="stat-icon">⭐</div>
+            <div class="stat-title">星标单词</div>
+            <div class="stat-count" id="starredCount">0</div>
+          </div>
         </div>
-        
-        <div class="home-card" data-page="phrase">
-          <div class="card-icon">📄</div>
-          <div class="card-title">词组</div>
-          <div class="card-count" id="phraseCount">0</div>
-        </div>
-        
-        <div class="home-card" data-page="sentence">
-          <div class="card-icon">💬</div>
-          <div class="card-title">句子</div>
-          <div class="card-count" id="sentenceCount">0</div>
-        </div>
-        
-        <div class="home-card" data-page="starred">
-          <div class="card-icon">⭐</div>
-          <div class="card-title">星标单词</div>
-          <div class="card-count" id="starredCount">0</div>
+
+        <!-- 右侧学习面板 -->
+        <div class="learning-panel">
+          <div class="learning-header">
+            <h3>📖 单词学习</h3>
+          </div>
+          <div class="learning-content" id="learningContent">
+            <div class="learning-placeholder">
+              <div class="placeholder-icon">🎯</div>
+              <div class="placeholder-text">选择左侧类别开始学习</div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
-    
-    <!-- Word List Page -->
+
+    <!-- 单词列表页面 - 显示具体类别的翻译记录 -->
     <div id="wordListPage" class="page">
+      <!-- 列表页面头部 -->
       <header class="header">
+        <!-- 返回按钮 -->
         <button class="back-btn" id="backBtn">← 返回</button>
         <h1 id="pageTitle">翻译记录</h1>
         <div class="stats">
