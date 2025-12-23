@@ -1,107 +1,140 @@
-/* 翻译弹窗样式 */
+/**
+ * 单词翻译助手 - 内容脚本样式文件
+ *
+ * 定义网页中注入的UI组件样式：
+ * 1. 翻译弹出窗口样式
+ * 2. 点击提示工具条样式
+ * 3. 高亮单词样式
+ * 4. 动画效果
+ * 5. 响应式设计
+ */
+
+/* ==================== */
+/* 翻译弹出窗口样式 */
+/* ==================== */
+
+/**
+ * 翻译弹出窗口主容器
+ * 固定定位的翻译结果显示窗口
+ */
 .translation-popup {
-  position: fixed;
-  background: white;
-  border: 2px solid #4a90e2;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  z-index: 10000;
-  min-width: 200px;
-  max-width: 400px;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-  animation: popupFadeIn 0.2s ease-out;
+  position: fixed;                    /* 固定定位，不随页面滚动 */
+  background: white;                  /* 白色背景 */
+  border: 2px solid #4a90e2;         /* 蓝色边框 */
+  border-radius: 8px;                /* 圆角边框 */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); /* 阴影效果 */
+  z-index: 10000;                    /* 高层级确保在最顶层 */
+  min-width: 200px;                  /* 最小宽度 */
+  max-width: 400px;                  /* 最大宽度 */
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; /* 系统字体 */
+  animation: popupFadeIn 0.2s ease-out; /* 淡入动画 */
 }
 
+/**
+ * 弹出窗口淡入动画
+ * 从透明和向上偏移的状态渐变到完全可见
+ */
 @keyframes popupFadeIn {
   from {
-    opacity: 0;
-    transform: translateY(-10px);
+    opacity: 0;                      /* 初始透明 */
+    transform: translateY(-10px);    /* 初始向上偏移10px */
   }
   to {
-    opacity: 1;
-    transform: translateY(0);
+    opacity: 1;                      /* 最终完全可见 */
+    transform: translateY(0);        /* 最终位置 */
   }
 }
 
+/**
+ * 翻译弹出窗口头部样式
+ * 包含标题和关闭按钮的区域
+ */
 .translation-popup-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px 15px;
-  background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
-  color: white;
-  border-radius: 6px 6px 0 0;
+  display: flex;                      /* 弹性布局 */
+  justify-content: space-between;     /* 两端对齐 */
+  align-items: center;                /* 垂直居中 */
+  padding: 10px 15px;                /* 内边距 */
+  border-bottom: 1px solid #e0e0e0;  /* 底部边框 */
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); /* 渐变背景 */
 }
 
-.translation-word {
-  font-weight: 700;
-  font-size: 18px;
-  padding: 4px 10px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.2);
-  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.35);
-  letter-spacing: 0.3px;
-}
-
+/**
+ * 弹出窗口关闭按钮样式
+ * 右上角的关闭按钮
+ */
 .translation-popup-close {
-  background: none;
-  border: none;
-  color: white;
-  font-size: 24px;
-  cursor: pointer;
-  padding: 0;
-  width: 24px;
-  height: 24px;
-  line-height: 24px;
-  border-radius: 4px;
-  transition: background-color 0.2s;
+  background: none;                   /* 无背景 */
+  border: none;                      /* 无边框 */
+  color: #666;                       /* 灰色文字 */
+  font-size: 20px;                   /* 大字体 */
+  cursor: pointer;                   /* 鼠标指针 */
+  padding: 0;                        /* 无内边距 */
+  width: 24px;                       /* 固定宽度 */
+  height: 24px;                      /* 固定高度 */
+  line-height: 24px;                 /* 行高 */
+  border-radius: 4px;                /* 小圆角 */
+  transition: background-color 0.2s; /* 背景色过渡动画 */
 }
 
+/**
+ * 关闭按钮悬停效果
+ * 鼠标悬停时显示背景色
+ */
 .translation-popup-close:hover {
-  background-color: rgba(255, 255, 255, 0.2);
+  background-color: rgba(0, 0, 0, 0.1); /* 半透明黑色背景 */
 }
 
 .translation-popup-content {
   padding: 15px;
 }
 
-.translation-phonetic {
-  color: #666;
-  font-size: 14px;
-  font-style: italic;
-  margin-bottom: 10px;
-  padding-bottom: 8px;
-  border-bottom: 1px solid #e0e0e0;
-}
-
-.translation-result {
+.translation-popup-word {
+  font-size: 18px;
+  font-weight: bold;
   color: #333;
-  font-size: 14px;
-  line-height: 1.6;
   margin-bottom: 8px;
 }
 
-.translation-count {
-  color: #888;
-  font-size: 12px;
-  padding-top: 8px;
-  border-top: 1px solid #e0e0e0;
+.translation-popup-translation {
+  font-size: 16px;
+  color: #555;
+  line-height: 1.4;
 }
 
-/* 已翻译单词高亮样式 */
+/* 高亮单词样式 */
 .translated-word-highlight {
-  background: linear-gradient(120deg, #84fab0 0%, #8fd3f4 100%);
+  position: relative;
+  display: inline-block;
   padding: 2px 4px;
-  border-radius: 3px;
-  cursor: help;
-  transition: all 0.2s;
-  font-weight: 500;
+  margin: 0 1px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  background: linear-gradient(120deg, #84fab0 0%, #8fd3f4 100%);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.translated-word-highlight::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -0%;
+  width: 0%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.translated-word-highlight:hover::before {
+  left: 100%;
 }
 
 .translated-word-highlight:hover {
   background: linear-gradient(120deg, #8fd3f4 0%, #84fab0 100%);
-  transform: scale(1.05);
+  transform: scale(1.02);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  filter: brightness(1.1);
 }
 
 /* 词性对应的高亮颜色，与弹窗保持同一渐变风格 */
@@ -109,32 +142,72 @@
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 }
 
+.translated-word-highlight.pos-noun:hover {
+  background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+  filter: brightness(1.1);
+}
+
 .translated-word-highlight.pos-verb {
   background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+}
+
+.translated-word-highlight.pos-verb:hover {
+  background: linear-gradient(135deg, #f5576c 0%, #f093fb 100%);
+  filter: brightness(1.1);
 }
 
 .translated-word-highlight.pos-adjective {
   background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
 }
 
+.translated-word-highlight.pos-adjective:hover {
+  background: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%);
+  filter: brightness(1.1);
+}
+
 .translated-word-highlight.pos-adverb {
   background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+}
+
+.translated-word-highlight.pos-adverb:hover {
+  background: linear-gradient(135deg, #38f9d7 0%, #43e97b 100%);
+  filter: brightness(1.1);
 }
 
 .translated-word-highlight.pos-pronoun {
   background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
 }
 
+.translated-word-highlight.pos-pronoun:hover {
+  background: linear-gradient(135deg, #fee140 0%, #fa709a 100%);
+  filter: brightness(1.1);
+}
+
 .translated-word-highlight.pos-preposition {
   background: linear-gradient(135deg, #30cfd0 0%, #330867 100%);
+}
+
+.translated-word-highlight.pos-preposition:hover {
+  background: linear-gradient(135deg, #330867 0%, #30cfd0 100%);
+  filter: brightness(1.1);
 }
 
 .translated-word-highlight.pos-conjunction {
   background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
 }
 
+.translated-word-highlight.pos-conjunction:hover {
+  background: linear-gradient(135deg, #fed6e3 0%, #a8edea 100%);
+  filter: brightness(1.1);
+}
+
 .translated-word-highlight.pos-interjection {
   background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+}
+
+.translated-word-highlight.pos-interjection:hover {
+  background: linear-gradient(135deg, #fcb69f 0%, #ffecd2 100%);
+  filter: brightness(1.1);
 }
 
 .translated-word-highlight.pos-determiner,
@@ -142,8 +215,19 @@
   background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
 }
 
+.translated-word-highlight.pos-determiner:hover,
+.translated-word-highlight.pos-article:hover {
+  background: linear-gradient(135deg, #fecfef 0%, #ff9a9e 100%);
+  filter: brightness(1.1);
+}
+
 .translated-word-highlight.pos-numeral {
   background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+}
+
+.translated-word-highlight.pos-numeral:hover {
+  background: linear-gradient(135deg, #fcb69f 0%, #ffecd2 100%);
+  filter: brightness(1.1);
 }
 
 .translated-word-highlight.pos-auxiliary,
@@ -151,8 +235,28 @@
   background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%);
 }
 
+.translated-word-highlight.pos-auxiliary:hover,
+.translated-word-highlight.pos-modal:hover {
+  background: linear-gradient(135deg, #c2e9fb 0%, #a1c4fd 100%);
+  filter: brightness(1.1);
+}
+
+.translated-word-highlight.pos-phrase {
+  background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+}
+
+.translated-word-highlight.pos-phrase:hover {
+  background: linear-gradient(135deg, #fcb69f 0%, #ffecd2 100%);
+  filter: brightness(1.1);
+}
+
 .translated-word-highlight.pos-default {
   background: linear-gradient(120deg, #84fab0 0%, #8fd3f4 100%);
+}
+
+.translated-word-highlight.pos-default:hover {
+  background: linear-gradient(120deg, #8fd3f4 0%, #84fab0 100%);
+  filter: brightness(1.1);
 }
 
 /* 点击提示样式 */
@@ -160,83 +264,22 @@
   position: fixed;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
+  padding: 16px;
   border-radius: 12px;
-  padding: 12px 16px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
   z-index: 10001;
-  min-width: 220px;
   max-width: 320px;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-  animation: tooltipFadeIn 0.2s ease-out;
-}
-
-/* 词性背景颜色 */
-.click-tooltip.pos-noun {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-}
-
-.click-tooltip.pos-verb {
-  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-}
-
-.click-tooltip.pos-adjective {
-  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-}
-
-.click-tooltip.pos-adverb {
-  background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
-}
-
-.click-tooltip.pos-pronoun {
-  background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
-}
-
-.click-tooltip.pos-preposition {
-  background: linear-gradient(135deg, #30cfd0 0%, #330867 100%);
-}
-
-.click-tooltip.pos-conjunction {
-  background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
-}
-
-.click-tooltip.pos-interjection {
-  background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
-}
-
-.click-tooltip.pos-determiner,
-.click-tooltip.pos-article {
-  background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
-}
-
-.click-tooltip.pos-numeral {
-  background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
-}
-
-.click-tooltip.pos-auxiliary,
-.click-tooltip.pos-modal {
-  background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%);
-}
-
-.click-tooltip.pos-default {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-}
-
-@keyframes tooltipFadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-5px) scale(0.95);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  animation: tooltipFadeIn 0.3s ease-out;
 }
 
 .tooltip-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  margin-bottom: 8px;
+  align-items: flex-start;
+  margin-bottom: 12px;
 }
 
 .tooltip-word {
@@ -296,6 +339,8 @@
   margin-bottom: 8px;
   line-height: 1.5;
   font-weight: 500;
+  background: transparent !important;
+  opacity: 0.85;
 }
 
 .tooltip-count {
@@ -322,12 +367,363 @@
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .tooltip-remove-btn:hover {
   background: rgba(255, 255, 255, 0.3);
   transform: translateY(-1px);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* 词性背景颜色 */
+.click-tooltip.pos-noun {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.click-tooltip.pos-noun .tooltip-phonetic,
+.click-tooltip.pos-noun .tooltip-part-of-speech,
+.click-tooltip.pos-noun .tooltip-count {
+  color: white;
+}
+
+.click-tooltip.pos-noun .tooltip-close {
+  color: white;
+}
+
+.click-tooltip.pos-noun .tooltip-remove-btn {
+  background: rgba(255, 255, 255, 0.25);
+  border-color: rgba(255, 255, 255, 0.4);
+  color: white;
+}
+
+.click-tooltip.pos-noun .tooltip-remove-btn:hover {
+  background: rgba(255, 255, 255, 0.35);
+}
+
+.click-tooltip.pos-verb {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  color: #2c3e50;
+}
+
+.click-tooltip.pos-verb .tooltip-phonetic,
+.click-tooltip.pos-verb .tooltip-part-of-speech,
+.click-tooltip.pos-verb .tooltip-count {
+  color: #2c3e50;
+}
+
+.click-tooltip.pos-verb .tooltip-close {
+  color: #2c3e50;
+}
+
+.click-tooltip.pos-verb .tooltip-remove-btn {
+  background: rgba(44, 62, 80, 0.9);
+  border-color: rgba(44, 62, 80, 0.6);
+  color: white;
+}
+
+.click-tooltip.pos-verb .tooltip-remove-btn:hover {
+  background: rgba(44, 62, 80, 0.95);
+}
+
+.click-tooltip.pos-adjective {
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  color: white;
+}
+
+.click-tooltip.pos-adjective .tooltip-phonetic,
+.click-tooltip.pos-adjective .tooltip-part-of-speech,
+.click-tooltip.pos-adjective .tooltip-count {
+  color: white;
+}
+
+.click-tooltip.pos-adjective .tooltip-close {
+  color: white;
+}
+
+.click-tooltip.pos-adjective .tooltip-remove-btn {
+  background: rgba(255, 255, 255, 0.25);
+  border-color: rgba(255, 255, 255, 0.4);
+  color: white;
+}
+
+.click-tooltip.pos-adjective .tooltip-remove-btn:hover {
+  background: rgba(255, 255, 255, 0.35);
+}
+
+.click-tooltip.pos-adverb {
+  background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+  color: #2c3e50;
+}
+
+.click-tooltip.pos-adverb .tooltip-phonetic,
+.click-tooltip.pos-adverb .tooltip-part-of-speech,
+.click-tooltip.pos-adverb .tooltip-count {
+  color: #2c3e50;
+}
+
+.click-tooltip.pos-adverb .tooltip-close {
+  color: #2c3e50;
+}
+
+.click-tooltip.pos-adverb .tooltip-remove-btn {
+  background: rgba(44, 62, 80, 0.9);
+  border-color: rgba(44, 62, 80, 0.6);
+  color: white;
+}
+
+.click-tooltip.pos-adverb .tooltip-remove-btn:hover {
+  background: rgba(44, 62, 80, 0.95);
+}
+
+.click-tooltip.pos-pronoun {
+  background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+  color: #2c3e50;
+}
+
+.click-tooltip.pos-pronoun .tooltip-phonetic,
+.click-tooltip.pos-pronoun .tooltip-part-of-speech,
+.click-tooltip.pos-pronoun .tooltip-count {
+  color: #2c3e50;
+}
+
+.click-tooltip.pos-pronoun .tooltip-close {
+  color: #2c3e50;
+}
+
+.click-tooltip.pos-pronoun .tooltip-remove-btn {
+  background: rgba(44, 62, 80, 0.9);
+  border-color: rgba(44, 62, 80, 0.6);
+  color: white;
+}
+
+.click-tooltip.pos-pronoun .tooltip-remove-btn:hover {
+  background: rgba(44, 62, 80, 0.95);
+}
+
+.click-tooltip.pos-preposition {
+  background: linear-gradient(135deg, #30cfd0 0%, #330867 100%);
+  color: white;
+}
+
+.click-tooltip.pos-preposition .tooltip-phonetic,
+.click-tooltip.pos-preposition .tooltip-part-of-speech,
+.click-tooltip.pos-preposition .tooltip-count {
+  color: white;
+}
+
+.click-tooltip.pos-preposition .tooltip-close {
+  color: white;
+}
+
+.click-tooltip.pos-preposition .tooltip-remove-btn {
+  background: rgba(255, 255, 255, 0.25);
+  border-color: rgba(255, 255, 255, 0.4);
+  color: white;
+}
+
+.click-tooltip.pos-preposition .tooltip-remove-btn:hover {
+  background: rgba(255, 255, 255, 0.35);
+}
+
+.click-tooltip.pos-conjunction {
+  background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+  color: #2c3e50;
+}
+
+.click-tooltip.pos-conjunction .tooltip-phonetic,
+.click-tooltip.pos-conjunction .tooltip-part-of-speech,
+.click-tooltip.pos-conjunction .tooltip-count {
+  color: #2c3e50;
+}
+
+.click-tooltip.pos-conjunction .tooltip-close {
+  color: #2c3e50;
+}
+
+.click-tooltip.pos-conjunction .tooltip-remove-btn {
+  background: rgba(44, 62, 80, 0.9);
+  border-color: rgba(44, 62, 80, 0.6);
+  color: white;
+}
+
+.click-tooltip.pos-conjunction .tooltip-remove-btn:hover {
+  background: rgba(44, 62, 80, 0.95);
+}
+
+.click-tooltip.pos-interjection {
+  background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+  color: #2c3e50;
+}
+
+.click-tooltip.pos-interjection .tooltip-phonetic,
+.click-tooltip.pos-interjection .tooltip-part-of-speech,
+.click-tooltip.pos-interjection .tooltip-count {
+  color: #2c3e50;
+}
+
+.click-tooltip.pos-interjection .tooltip-close {
+  color: #2c3e50;
+}
+
+.click-tooltip.pos-interjection .tooltip-remove-btn {
+  background: rgba(44, 62, 80, 0.9);
+  border-color: rgba(44, 62, 80, 0.6);
+  color: white;
+}
+
+.click-tooltip.pos-interjection .tooltip-remove-btn:hover {
+  background: rgba(44, 62, 80, 0.95);
+}
+
+.click-tooltip.pos-determiner,
+.click-tooltip.pos-article {
+  background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+  color: #2c3e50;
+}
+
+.click-tooltip.pos-determiner .tooltip-phonetic,
+.click-tooltip.pos-determiner .tooltip-part-of-speech,
+.click-tooltip.pos-determiner .tooltip-count,
+.click-tooltip.pos-article .tooltip-phonetic,
+.click-tooltip.pos-article .tooltip-part-of-speech,
+.click-tooltip.pos-article .tooltip-count {
+  color: #2c3e50;
+}
+
+.click-tooltip.pos-determiner .tooltip-close,
+.click-tooltip.pos-article .tooltip-close {
+  color: #2c3e50;
+}
+
+.click-tooltip.pos-determiner .tooltip-remove-btn,
+.click-tooltip.pos-article .tooltip-remove-btn {
+  background: rgba(44, 62, 80, 0.9);
+  border-color: rgba(44, 62, 80, 0.6);
+  color: white;
+}
+
+.click-tooltip.pos-determiner .tooltip-remove-btn:hover,
+.click-tooltip.pos-article .tooltip-remove-btn:hover {
+  background: rgba(44, 62, 80, 0.95);
+}
+
+.click-tooltip.pos-numeral {
+  background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+  color: #2c3e50;
+}
+
+.click-tooltip.pos-numeral .tooltip-phonetic,
+.click-tooltip.pos-numeral .tooltip-part-of-speech,
+.click-tooltip.pos-numeral .tooltip-count {
+  color: #2c3e50;
+}
+
+.click-tooltip.pos-numeral .tooltip-close {
+  color: #2c3e50;
+}
+
+.click-tooltip.pos-numeral .tooltip-remove-btn {
+  background: rgba(44, 62, 80, 0.9);
+  border-color: rgba(44, 62, 80, 0.6);
+  color: white;
+}
+
+.click-tooltip.pos-numeral .tooltip-remove-btn:hover {
+  background: rgba(44, 62, 80, 0.95);
+}
+
+.click-tooltip.pos-auxiliary,
+.click-tooltip.pos-modal {
+  background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%);
+  color: #2c3e50;
+}
+
+.click-tooltip.pos-auxiliary .tooltip-phonetic,
+.click-tooltip.pos-auxiliary .tooltip-part-of-speech,
+.click-tooltip.pos-auxiliary .tooltip-count,
+.click-tooltip.pos-modal .tooltip-phonetic,
+.click-tooltip.pos-modal .tooltip-part-of-speech,
+.click-tooltip.pos-modal .tooltip-count {
+  color: #2c3e50;
+}
+
+.click-tooltip.pos-auxiliary .tooltip-close,
+.click-tooltip.pos-modal .tooltip-close {
+  color: #2c3e50;
+}
+
+.click-tooltip.pos-auxiliary .tooltip-remove-btn,
+.click-tooltip.pos-modal .tooltip-remove-btn {
+  background: rgba(44, 62, 80, 0.9);
+  border-color: rgba(44, 62, 80, 0.6);
+  color: white;
+}
+
+.click-tooltip.pos-auxiliary .tooltip-remove-btn:hover,
+.click-tooltip.pos-modal .tooltip-remove-btn:hover {
+  background: rgba(44, 62, 80, 0.95);
+}
+
+.click-tooltip.pos-phrase {
+  background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+  color: #2c3e50;
+}
+
+.click-tooltip.pos-phrase .tooltip-phonetic,
+.click-tooltip.pos-phrase .tooltip-part-of-speech,
+.click-tooltip.pos-phrase .tooltip-count {
+  color: #2c3e50;
+}
+
+.click-tooltip.pos-phrase .tooltip-close {
+  color: #2c3e50;
+}
+
+.click-tooltip.pos-phrase .tooltip-remove-btn {
+  background: rgba(44, 62, 80, 0.9);
+  border-color: rgba(44, 62, 80, 0.6);
+  color: white;
+}
+
+.click-tooltip.pos-phrase .tooltip-remove-btn:hover {
+  background: rgba(44, 62, 80, 0.95);
+}
+
+.click-tooltip.pos-default {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.click-tooltip.pos-default .tooltip-phonetic,
+.click-tooltip.pos-default .tooltip-part-of-speech,
+.click-tooltip.pos-default .tooltip-count {
+  color: white;
+}
+
+.click-tooltip.pos-default .tooltip-close {
+  color: white;
+}
+
+.click-tooltip.pos-default .tooltip-remove-btn {
+  background: rgba(255, 255, 255, 0.25);
+  border-color: rgba(255, 255, 255, 0.4);
+  color: white;
+}
+
+.click-tooltip.pos-default .tooltip-remove-btn:hover {
+  background: rgba(255, 255, 255, 0.35);
+}
+
+@keyframes tooltipFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
