@@ -13,13 +13,30 @@
   ],
 
   "host_permissions": [
-    "http://*/*",   
-    "https://*/*"   
+    "https://*.wikipedia.org/*",
+    "https://*.zhihu.com/*",
+    "https://*.blog.csdn.net/*",
+    "https://*.medium.com/*",
+    "https://*.dev.to/*",
+    "https://*.stackoverflow.com/*",
+    "https://*.github.io/*",
+    "https://*.gitbook.io/*",
+    "https://*.notion.site/*"
   ],
 
   "content_scripts": [
     {
-      "matches": ["<all_urls>"],       
+      "matches": [
+        "https://*.wikipedia.org/*",
+        "https://*.zhihu.com/*",
+        "https://*.blog.csdn.net/*",
+        "https://*.medium.com/*",
+        "https://*.dev.to/*",
+        "https://*.stackoverflow.com/*",
+        "https://*.github.io/*",
+        "https://*.gitbook.io/*",
+        "https://*.notion.site/*"
+      ],       
       "js": ["content.js"],            
       "css": ["content.css"],          
       "run_at": "document_end"         
