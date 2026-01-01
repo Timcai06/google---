@@ -22,6 +22,8 @@
         <div class="stats">
           <span id="totalWords">0</span> 个翻译记录
         </div>
+        <!-- 设置按钮 -->
+        <button id="settingsBtn" class="settings-btn">⚙️ 设置</button>
       </header>
 
       <!-- 首页内容区域 - 左右两列布局 -->
@@ -63,9 +65,24 @@
             <h3>📖 单词学习</h3>
           </div>
           <div class="learning-content" id="learningContent">
-            <div class="learning-placeholder">
-              <div class="placeholder-icon">🎯</div>
-              <div class="placeholder-text">选择左侧类别开始学习</div>
+            <div class="learning-actions">
+              <button class="learning-btn" id="startLearningBtn">🚀 开始学习</button>
+              <button class="learning-btn" id="reviewDifficultBtn">💪 复习难点</button>
+              <button class="learning-btn" id="dailyChallengeBtn">🎯 每日挑战</button>
+            </div>
+            <div class="learning-stats-display">
+              <div class="stat-row">
+                <span class="stat-label">今日学习：</span>
+                <span class="stat-value" id="todayLearned">0</span>
+              </div>
+              <div class="stat-row">
+                <span class="stat-label">掌握程度：</span>
+                <span class="stat-value" id="masteryLevel">0%</span>
+              </div>
+              <div class="stat-row">
+                <span class="stat-label">待复习：</span>
+                <span class="stat-value" id="toReview">0</span>
+              </div>
             </div>
           </div>
         </div>
@@ -91,11 +108,290 @@
           <option value="lastUsed">按最近使用</option>
           <option value="word">按字母顺序</option>
         </select>
-        <button id="clearAllBtn" class="clear-btn">清空记录</button>
+        <div class="control-buttons">
+          <button id="importBtn" class="import-btn">📥 导入</button>
+          <button id="exportBtn" class="export-btn">📤 导出</button>
+          <button id="clearAllBtn" class="clear-btn">清空记录</button>
+        </div>
       </div>
       
       <div class="word-list" id="wordList">
         <div class="empty-state">暂无翻译记录</div>
+      </div>
+    </div>
+
+    <!-- 学习模式页面 -->
+    <div id="learningPage" class="page">
+      <header class="header">
+        <button class="back-btn" id="backBtnFromLearning">← 返回</button>
+        <h1>📚 单词学习</h1>
+        <div class="learning-stats">
+          <span id="learningProgress">0/20</span>
+        </div>
+      </header>
+      
+      <div class="learning-content">
+        <div class="learning-modes">
+          <button class="mode-btn active" data-mode="flashcard">📖 闪卡模式</button>
+          <button class="mode-btn" data-mode="quiz">📝 测验模式</button>
+          <button class="mode-btn" data-mode="spelling">✍️ 拼写模式</button>
+        </div>
+
+        <div class="learning-area" id="learningArea">
+          <div class="flashcard-mode active" id="flashcardMode">
+            <div class="flashcard">
+              <div class="card-front">
+                <div class="word-display" id="currentWord">Loading...</div>
+                <div class="phonetic-display" id="currentPhonetic"></div>
+                <div class="part-of-speech" id="currentPOS"></div>
+              </div>
+              <div class="card-back">
+                <div class="translation-display" id="currentTranslation">点击翻转查看翻译</div>
+                <div class="word-examples" id="currentExamples"></div>
+              </div>
+            </div>
+            <div class="card-controls">
+              <button class="control-btn difficulty-btn" data-difficulty="hard">😵 困难</button>
+              <button class="control-btn flip-btn" id="flipCard">🔄 翻转</button>
+              <button class="control-btn difficulty-btn" data-difficulty="easy">😊 简单</button>
+            </div>
+          </div>
+
+          <div class="quiz-mode" id="quizMode">
+            <div class="quiz-question">
+              <div class="question-text" id="quizQuestion">Loading...</div>
+              <div class="quiz-options" id="quizOptions">
+                <!-- 选项将动态生成 -->
+              </div>
+            </div>
+            <div class="quiz-result" id="quizResult" style="display: none;">
+              <div class="result-icon" id="resultIcon"></div>
+              <div class="result-text" id="resultText"></div>
+              <button class="control-btn next-btn" id="nextQuiz">下一题</button>
+            </div>
+          </div>
+
+          <div class="spelling-mode" id="spellingMode">
+            <div class="spelling-question">
+              <div class="spelling-prompt" id="spellingPrompt">Loading...</div>
+              <div class="spelling-input-area">
+                <input type="text" class="spelling-input" id="spellingInput" placeholder="输入单词拼写...">
+                <button class="control-btn submit-btn" id="submitSpelling">提交</button>
+              </div>
+              <div class="spelling-result" id="spellingResult" style="display: none;">
+                <div class="spelling-feedback" id="spellingFeedback"></div>
+                <div class="correct-spelling" id="correctSpelling"></div>
+                <button class="control-btn next-btn" id="nextSpelling">下一题</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="learning-summary" id="learningSummary" style="display: none;">
+          <div class="summary-title">🎉 学习完成！</div>
+          <div class="summary-stats">
+            <div class="stat-item">
+              <span class="stat-label">总题数：</span>
+              <span class="stat-value" id="totalQuestions">0</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">正确数：</span>
+              <span class="stat-value" id="correctAnswers">0</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">正确率：</span>
+              <span class="stat-value" id="accuracyRate">0%</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">学习时间：</span>
+              <span class="stat-value" id="learningTime">0分钟</span>
+            </div>
+          </div>
+          <div class="summary-actions">
+            <button class="control-btn" id="reviewMistakes">复习错题</button>
+            <button class="control-btn" id="startNewSession">开始新学习</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 设置页面 -->
+    <div id="settingsPage" class="page">
+      <header class="header">
+        <button class="back-btn" id="backBtnFromSettings">← 返回</button>
+        <h1>⚙️ 设置</h1>
+      </header>
+      
+      <div class="settings-content">
+        <div class="settings-section">
+          <h3>🎨 外观设置</h3>
+          <div class="setting-item">
+            <label>背景颜色主题：</label>
+            <select id="backgroundTheme">
+              <option value="default">默认主题</option>
+              <option value="dark">深色主题</option>
+              <option value="blue">蓝色主题</option>
+              <option value="purple">紫色主题</option>
+              <option value="green">绿色主题</option>
+              <option value="custom">自定义颜色</option>
+            </select>
+          </div>
+          <div class="setting-item" id="customBackgroundColor" style="display: none;">
+            <label>自定义背景颜色：</label>
+            <input type="color" id="backgroundColor" value="#667eea">
+          </div>
+          <div class="setting-item">
+            <label>高亮颜色主题：</label>
+            <select id="highlightTheme">
+              <option value="default">默认主题</option>
+              <option value="dark">深色主题</option>
+              <option value="colorful">彩色主题</option>
+              <option value="custom">自定义</option>
+            </select>
+          </div>
+          <div class="setting-item" id="customColors" style="display: none;">
+            <label>自定义颜色：</label>
+            <div class="color-picker-group">
+              <div class="color-item">
+                <label>名词：</label>
+                <input type="color" id="colorNoun" value="#4CAF50">
+              </div>
+              <div class="color-item">
+                <label>动词：</label>
+                <input type="color" id="colorVerb" value="#2196F3">
+              </div>
+              <div class="color-item">
+                <label>形容词：</label>
+                <input type="color" id="colorAdjective" value="#FF9800">
+              </div>
+              <div class="color-item">
+                <label>副词：</label>
+                <input type="color" id="colorAdverb" value="#9C27B0">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="settings-section">
+          <h3>🌐 翻译设置</h3>
+          <div class="setting-item">
+            <label>翻译API：</label>
+            <select id="translationAPI">
+              <option value="youdao">有道翻译</option>
+              <option value="baidu">百度翻译</option>
+              <option value="google">谷歌翻译</option>
+              <option value="mymemory">MyMemory</option>
+            </select>
+          </div>
+          <div class="setting-item">
+            <label>API密钥：</label>
+            <input type="password" id="apiKey" placeholder="输入API密钥">
+          </div>
+          <div class="setting-item">
+            <label>API密钥：</label>
+            <input type="password" id="apiSecret" placeholder="输入API密钥（如需要）">
+          </div>
+        </div>
+
+        <div class="settings-section">
+          <h3>📚 学习设置</h3>
+          <div class="setting-item">
+            <label>每日学习目标：</label>
+            <input type="number" id="dailyGoal" value="20" min="5" max="100">
+            <span>个单词</span>
+          </div>
+          <div class="setting-item">
+            <label>学习模式：</label>
+            <select id="learningMode">
+              <option value="normal">普通模式</option>
+              <option value="intensive">强化模式</option>
+              <option value="review">复习模式</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="settings-section">
+          <h3>💾 数据管理</h3>
+          <div class="setting-item">
+            <button id="exportSettingsBtn" class="settings-action-btn">导出设置</button>
+            <button id="importSettingsBtn" class="settings-action-btn">导入设置</button>
+          </div>
+          <div class="setting-item">
+            <button id="resetSettingsBtn" class="settings-action-btn reset-btn">重置所有设置</button>
+          </div>
+        </div>
+
+        <div class="settings-actions">
+          <button id="saveSettingsBtn" class="save-btn">保存设置</button>
+          <button id="cancelSettingsBtn" class="cancel-btn">取消</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 导入对话框 -->
+    <div id="importDialog" class="dialog-overlay" style="display: none;">
+      <div class="dialog">
+        <div class="dialog-header">
+          <h3>📥 导入数据</h3>
+          <button class="dialog-close" id="closeImportDialog">×</button>
+        </div>
+        <div class="dialog-content">
+          <div class="import-options">
+            <label>导入方式：</label>
+            <select id="importMode">
+              <option value="merge">合并导入（保留现有数据）</option>
+              <option value="replace">覆盖导入（清空现有数据）</option>
+            </select>
+          </div>
+          <div class="file-upload">
+            <input type="file" id="importFile" accept=".json,.csv" class="file-input">
+            <label for="importFile" class="file-label">选择文件</label>
+          </div>
+          <div class="import-preview" id="importPreview" style="display: none;">
+            <h4>导入预览</h4>
+            <div id="previewContent"></div>
+          </div>
+        </div>
+        <div class="dialog-actions">
+          <button id="confirmImportBtn" class="confirm-btn" disabled>确认导入</button>
+          <button id="cancelImportBtn" class="cancel-btn">取消</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 导出对话框 -->
+    <div id="exportDialog" class="dialog-overlay" style="display: none;">
+      <div class="dialog">
+        <div class="dialog-header">
+          <h3>📤 导出数据</h3>
+          <button class="dialog-close" id="closeExportDialog">×</button>
+        </div>
+        <div class="dialog-content">
+          <div class="export-options">
+            <label>导出内容：</label>
+            <select id="exportContent">
+              <option value="all">所有数据</option>
+              <option value="words">仅单词</option>
+              <option value="phrases">仅词组</option>
+              <option value="sentences">仅句子</option>
+              <option value="starred">仅星标</option>
+            </select>
+          </div>
+          <div class="export-format">
+            <label>导出格式：</label>
+            <select id="exportFormat">
+              <option value="json">JSON</option>
+              <option value="csv">CSV</option>
+            </select>
+          </div>
+          <div class="export-stats" id="exportStats">
+            <span>预计导出：<span id="exportCount">0</span> 条记录</span>
+          </div>
+        </div>
+        <div class="dialog-actions">
+          <button id="confirmExportBtn" class="confirm-btn">确认导出</button>
+          <button id="cancelExportBtn" class="cancel-btn">取消</button>
+        </div>
       </div>
     </div>
   </div>
