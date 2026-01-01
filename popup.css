@@ -25,6 +25,56 @@
 }
 
 /* ==================== */
+/* CSS变量系统 - 主题颜色 */
+/* ==================== */
+
+:root {
+  /* 背景颜色变量 */
+  --bg-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --bg-secondary: rgba(255, 255, 255, 0.8);
+  --bg-card: rgba(255, 255, 255, 0.6);
+  --bg-card-hover: rgba(255, 255, 255, 0.75);
+  --bg-input: rgba(255, 255, 255, 0.6);
+  --bg-input-focus: rgba(255, 255, 255, 0.8);
+  --bg-word-list: rgba(255, 255, 255, 0.2);
+  --bg-highlight: rgba(255, 255, 255, 0.3);
+  
+  /* 文字颜色变量 */
+  --text-primary: #1a1a1a;
+  --text-secondary: #555;
+  --text-tertiary: #888;
+  --text-placeholder: #999;
+  
+  /* UI元素颜色变量 */
+  --border-color: rgba(0, 0, 0, 0.08);
+  --border-hover: rgba(0, 0, 0, 0.12);
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+  
+  /* 强调色变量 */
+  --accent-primary: #667eea;
+  --accent-secondary: #764ba2;
+  --accent-success: #27ae60;
+  --accent-danger: #e74c3c;
+  --accent-warning: #f39c12;
+  --accent-info: #3498db;
+  
+  /* 星标颜色 */
+  --star-color: #f1c40f;
+  --star-hover: #f39c12;
+  
+  /* 装饰条颜色 */
+  --decoration-color: linear-gradient(135deg, rgba(168, 237, 234, 0.6) 0%, rgba(254, 214, 227, 0.6) 100%);
+  
+  /* 过渡动画 */
+  --transition-fast: 0.2s ease;
+  --transition-normal: 0.3s ease;
+  --transition-slow: 0.5s ease;
+  --transition-easing: cubic-bezier(0.4, 0.2, 0.2, 1);
+}
+
+/* ==================== */
 /* 页面基础布局 */
 /* ==================== */
 
@@ -37,8 +87,25 @@ body {
   min-height: 600px;                  /* 设置页面最小高度为600px */
   max-height: 800px;                  /* 设置页面最大高度为800px */
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; /* 设置系统字体栈，确保跨平台一致性 */
-  background: linear-gradient(135deg, #0e39d5 0%, #c90cd3 100%); /* 设置渐变背景，从薄荷绿到粉色 */
+  background: var(--bg-primary);      /* 使用CSS变量设置背景 */
+  background-size: 400% 400%;         /* 设置背景大小以支持动态效果 */
   padding: 20px;                      /* 设置页面内边距为20px */
+  transition: background var(--transition-normal), background-position var(--transition-slow); /* 背景渐变过渡效果 */
+  animation: gradientShift 15s ease infinite; /* 添加动态渐变动画 */
+}
+
+/* 动态渐变效果动画 */
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* 深色主题支持 */
+@media (prefers-color-scheme: dark) {
+  body {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); /* 深色渐变背景 */
+  }
 }
 
 /**
@@ -46,17 +113,27 @@ body {
  * 使用毛玻璃效果的半透明容器
  */
 .container {
-  background: rgba(255, 255, 255, 0.5);    /* 设置半透明白色背景，透明度70% */
-  backdrop-filter: blur(20px);              /* 应用背景模糊滤镜，模糊半径20px */
-  -webkit-backdrop-filter: blur(20px);      /* Safari浏览器兼容的背景模糊 */
-  height: 550px;                           /* 容器高度设置为600px */
-  display: flex;                           /* 使用弹性布局 */
-  flex-direction: column;                   /* 子元素垂直排列 */
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1); /* 添加大阴影效果，增强立体感 */
-  border-radius: 24px;                     /* 设置大圆角，24px半径 */
-  overflow: hidden;                        /* 隐藏超出容器边界的内容 */
+  background: var(--bg-secondary);       /* 使用CSS变量设置背景 */
+  backdrop-filter: blur(20px);           /* 应用背景模糊滤镜，模糊半径20px */
+  -webkit-backdrop-filter: blur(20px);   /* Safari浏览器兼容的背景模糊 */
+  height: 550px;                         /* 容器高度设置为550px */
+  display: flex;                         /* 使用弹性布局 */
+  flex-direction: column;               /* 子元素垂直排列 */
+  box-shadow: var(--shadow-lg);          /* 使用CSS变量设置阴影 */
+  border-radius: 24px;                   /* 设置大圆角，24px半径 */
+  overflow: hidden;                      /* 隐藏超出容器边界的内容 */
   border: 1px solid rgba(255, 255, 255, 0.3); /* 添加半透明边框 */
-  position: relative;                      /* 设置相对定位 */
+  position: relative;                    /* 设置相对定位 */
+  transition: all var(--transition-normal); /* 平滑过渡效果 */
+}
+
+/* 深色主题下的容器样式 */
+@media (prefers-color-scheme: dark) {
+  .container {
+    background: rgba(30, 30, 40, 0.8);     /* 深色半透明背景 */
+    border: 1px solid rgba(255, 255, 255, 0.1); /* 更细的浅色边框 */
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3); /* 更深的阴影 */
+  }
 }
 
 /* ==================== */
@@ -90,14 +167,14 @@ body {
  * 毛玻璃效果的头部区域
  */
 .header {
-  background: rgba(255, 255, 255, 0.2);    /* 半透明白色背景，透明度40% */
-  backdrop-filter: blur(10px);              /* 背景模糊滤镜，10px半径 */
-  -webkit-backdrop-filter: blur(10px);      /* Safari兼容的背景模糊 */
-  color: #2c3e50;                          /* 设置文字颜色为深蓝灰 */
-  padding: 16px 20px;                      /* 设置内边距，上下16px，左右20px */
-  text-align: center;                      /* 文字居中对齐 */
-  position: relative;                      /* 相对定位 */
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05); /* 底部细边框，增强层次感 */
+  background: var(--bg-card);            /* 使用CSS变量设置背景 */
+  backdrop-filter: blur(10px);           /* 背景模糊滤镜，10px半径 */
+  -webkit-backdrop-filter: blur(10px);   /* Safari兼容的背景模糊 */
+  color: var(--text-primary);            /* 使用CSS变量设置文字颜色 */
+  padding: 16px 20px;                    /* 设置内边距，上下16px，左右20px */
+  text-align: center;                    /* 文字居中对齐 */
+  position: relative;                    /* 相对定位 */
+  border-bottom: 1px solid var(--border-color); /* 使用CSS变量设置底部边框 */
   display: flex;                           /* 弹性布局 */
   align-items: center;                     /* 子元素垂直居中 */
   justify-content: space-between;          /* 子元素两端对齐 */
@@ -106,28 +183,29 @@ body {
 /**
  * 返回按钮样式
  */
-.back-btn {
-  background: rgba(255, 255, 255, 0.6);    /* 半透明白色背景，60%透明度 */
+.back-btn, .settings-btn {
+  background: var(--bg-card);            /* 使用CSS变量设置背景 */
   backdrop-filter: blur(10px);             /* 背景模糊效果 */
   -webkit-backdrop-filter: blur(10px);     /* Safari兼容 */
-  border: 1px solid rgba(0, 0, 0, 0.1);   /* 细边框，10%透明度黑色 */
+  border: 1px solid var(--border-color); /* 使用CSS变量设置边框 */
   border-radius: 12px;                    /* 圆角边框，12px半径 */
   padding: 8px 16px;                      /* 内边距，上下8px，左右16px */
   font-size: 14px;                        /* 字体大小14px */
   font-weight: 600;                       /* 字体粗细600（半粗体） */
-  color: #2c3e50;                         /* 文字颜色深蓝灰 */
+  color: var(--text-primary);            /* 使用CSS变量设置文字颜色 */
   cursor: pointer;                        /* 鼠标指针为手型 */
   transition: all 0.3s ease;              /* 所有属性0.3秒缓动过渡 */
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05); /* 小阴影效果 */
+  box-shadow: var(--shadow-sm);          /* 使用CSS变量设置阴影效果 */
 }
 
 /**
  * 返回按钮悬停效果
  */
-.back-btn:hover {
-  background: rgba(255, 255, 255, 0.8);   /* 悬停时背景更不透明 */
+.back-btn:hover, .settings-btn:hover {
+  background: var(--bg-card-hover);      /* 使用CSS变量设置悬停背景 */
   transform: translateY(-1px);            /* 向上移动1px */
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* 增强阴影效果 */
+  box-shadow: var(--shadow-md);          /* 使用CSS变量设置悬停阴影 */
+  border-color: var(--border-hover);     /* 使用CSS变量设置悬停边框 */
 }
 
 /**
@@ -142,7 +220,7 @@ body {
   z-index: 1;                            /* 层级为1 */
   font-weight: 600;                      /* 字体粗细600 */
   letter-spacing: -0.5px;                /* 字间距-0.5px，略微紧凑 */
-  color: #1a1a1a;                        /* 深黑色文字 */
+  color: var(--text-primary);            /* 使用CSS变量设置文字颜色 */
 }
 
 /**
@@ -158,7 +236,7 @@ body {
   position: relative;                    /* 相对定位 */
   z-index: 1;                            /* 层级为1 */
   font-weight: 500;                      /* 字体粗细500 */
-  color: #666;                           /* 灰色文字 */
+  color: var(--text-secondary);          /* 使用CSS变量设置文字颜色 */
 }
 
 /* ==================== */
@@ -171,10 +249,10 @@ body {
  */
 .controls {
   padding: 12px 16px;                    /* 内边距12px 16px */
-  background: rgba(255, 255, 255, 0.3);  /* 半透明白色背景 */
+  background: var(--bg-highlight);       /* 使用CSS变量设置背景 */
   backdrop-filter: blur(10px);           /* 背景模糊 */
   -webkit-backdrop-filter: blur(10px);   /* Safari兼容 */
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05); /* 底部边框 */
+  border-bottom: 1px solid var(--border-color); /* 使用CSS变量设置底部边框 */
   display: flex;                         /* 弹性布局 */
   gap: 10px;                             /* 子元素间距10px */
   flex-wrap: wrap;                       /* 允许换行 */
@@ -190,16 +268,16 @@ body {
   flex: 1;                               /* 占据可用空间 */
   min-width: 120px;                      /* 最小宽度120px */
   padding: 12px 16px;                    /* 内边距12px 16px */
-  border: 1px solid rgba(0, 0, 0, 0.1); /* 边框样式 */
+  border: 1px solid var(--border-color); /* 使用CSS变量设置边框样式 */
   border-radius: 16px;                   /* 圆角16px */
   font-size: 14px;                       /* 字体大小14px */
   outline: none;                         /* 移除默认轮廓 */
-  transition: all 0.3s ease;             /* 过渡动画 */
-  background: rgba(255, 255, 255, 0.6);  /* 背景色 */
+  transition: all var(--transition-normal); /* 使用CSS变量设置过渡动画 */
+  background: var(--bg-input);           /* 使用CSS变量设置背景色 */
   backdrop-filter: blur(10px);           /* 背景模糊 */
   -webkit-backdrop-filter: blur(10px);   /* Safari兼容 */
-  color: #2c3e50;                        /* 文字颜色 */
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05); /* 阴影 */
+  color: var(--text-primary);            /* 使用CSS变量设置文字颜色 */
+  box-shadow: var(--shadow-sm);          /* 使用CSS变量设置阴影 */
 }
 
 /**
@@ -208,9 +286,9 @@ body {
 .search-input:focus,
 .type-filter:focus,
 .sort-select:focus {
-  background: rgba(255, 255, 255, 0.8);  /* 聚焦时背景更亮 */
-  border-color: rgba(0, 0, 0, 0.15);    /* 边框颜色加深 */
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* 增强阴影 */
+  background: var(--bg-input-focus);     /* 使用CSS变量设置聚焦时背景 */
+  border-color: var(--border-hover);     /* 使用CSS变量设置聚焦时边框颜色 */
+  box-shadow: var(--shadow-md);          /* 使用CSS变量设置聚焦时阴影 */
   transform: translateY(-1px);           /* 向上移动 */
 }
 
@@ -218,7 +296,7 @@ body {
  * 搜索框占位符样式
  */
 .search-input::placeholder {
-  color: #999;                           /* 占位符颜色为灰色 */
+  color: var(--text-placeholder);        /* 使用CSS变量设置占位符颜色 */
 }
 
 /**
@@ -275,7 +353,7 @@ body {
   flex: 1;                               /* 占据剩余空间 */
   overflow-y: auto;                      /* 垂直滚动 */
   padding: 16px;                         /* 内边距16px */
-  background: rgba(255, 255, 255, 0.2);  /* 半透明白色背景 */
+  background: var(--bg-word-list);       /* 使用CSS变量设置背景 */
   backdrop-filter: blur(5px);            /* 轻微背景模糊 */
   -webkit-backdrop-filter: blur(5px);    /* Safari兼容 */
   border-radius: 0 0 24px 24px;          /* 底部圆角 */
@@ -295,15 +373,16 @@ body {
 .group-title {
   font-size: 15px;                       /* 字体大小15px */
   font-weight: 600;                      /* 字体粗细600 */
-  color: #2c3e50;                        /* 深蓝灰色文字 */
+  color: var(--text-primary);            /* 使用CSS变量设置文字颜色 */
   margin: 20px 0 12px 0;                 /* 外边距 */
   padding: 10px 16px;                    /* 内边距 */
-  background: rgba(255, 255, 255, 0.5);  /* 半透明白色背景 */
+  background: var(--bg-card);            /* 使用CSS变量设置背景 */
   backdrop-filter: blur(10px);           /* 背景模糊 */
   -webkit-backdrop-filter: blur(10px);   /* Safari兼容 */
   border-radius: 16px;                   /* 圆角16px */
-  border: 1px solid rgba(0, 0, 0, 0.08); /* 细边框 */
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05); /* 小阴影 */
+  border: 1px solid var(--border-color); /* 使用CSS变量设置边框颜色 */
+  box-shadow: var(--shadow-sm);          /* 使用CSS变量设置阴影 */
+  transition: all var(--transition-normal); /* 添加过渡效果 */
 }
 
 /**
@@ -318,16 +397,16 @@ body {
  */
 .empty-state {
   text-align: center;                    /* 文字居中 */
-  color: #999;                           /* 灰色文字 */
+  color: var(--text-placeholder);        /* 使用CSS变量设置文字颜色 */
   padding: 60px 20px;                    /* 内边距 */
   font-size: 16px;                       /* 字体大小16px */
-  background: rgba(255, 255, 255, 0.5);  /* 半透明白色背景 */
+  background: var(--bg-card);            /* 使用CSS变量设置背景 */
   backdrop-filter: blur(10px);           /* 背景模糊 */
   -webkit-backdrop-filter: blur(10px);   /* Safari兼容 */
   border-radius: 24px;                   /* 圆角24px */
   margin: 20px;                          /* 外边距20px */
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08); /* 阴影 */
-  border: 1px solid rgba(0, 0, 0, 0.05); /* 细边框 */
+  box-shadow: var(--shadow-md);          /* 使用CSS变量设置阴影 */
+  border: 1px solid var(--border-color); /* 使用CSS变量设置边框颜色 */
 }
 
 /* ==================== */
@@ -338,18 +417,18 @@ body {
  * 单词项基础样式
  */
 .word-item {
-  background: rgba(255, 255, 255, 0.6);  /* 半透明白色背景 */
+  background: var(--bg-card);            /* 使用CSS变量设置背景 */
   backdrop-filter: blur(15px);           /* 背景模糊效果 */
   -webkit-backdrop-filter: blur(15px);   /* Safari兼容 */
-  border: 1px solid rgba(0, 0, 0, 0.08); /* 细边框 */
+  border: 1px solid var(--border-color); /* 使用CSS变量设置边框颜色 */
   border-radius: 24px;                   /* 圆角24px */
   padding: 16px;                         /* 内边距16px */
   margin-bottom: 10px;                   /* 下边距10px */
-  transition: all 0.3s cubic-bezier(0.4, 0.2, 0.2, 1); /* 缓动过渡 */
+  transition: all var(--transition-easing); /* 使用CSS变量设置过渡效果 */
   cursor: pointer;                       /* 鼠标指针为手型 */
   position: relative;                    /* 相对定位 */
   overflow: hidden;                      /* 隐藏溢出内容 */
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08); /* 阴影效果 */
+  box-shadow: var(--shadow-md);          /* 使用CSS变量设置阴影 */
 }
 
 /**
@@ -370,9 +449,9 @@ body {
   left: 0;                               /* 左侧对齐 */
   width: 3px;                            /* 宽度3px */
   height: 100%;                          /* 高度100% */
-  background: linear-gradient(135deg, rgba(168, 237, 234, 0.6) 0%, rgba(254, 214, 227, 0.6) 100%); /* 渐变背景 */
+  background: var(--decoration-color);   /* 使用CSS变量设置装饰条颜色 */
   transform: scaleY(0);                  /* 初始隐藏 */
-  transition: transform 0.3s ease;       /* 过渡动画 */
+  transition: transform var(--transition-normal); /* 使用CSS变量设置过渡效果 */
   border-radius: 0 3px 3px 0;            /* 右边圆角 */
 }
 
@@ -380,10 +459,10 @@ body {
  * 单词项悬停效果
  */
 .word-item:hover {
-  background: rgba(255, 255, 255, 0.75); /* 悬停时背景更亮 */
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12); /* 增强阴影 */
+  background: var(--bg-card-hover);      /* 使用CSS变量设置悬停背景 */
+  box-shadow: var(--shadow-lg);          /* 使用CSS变量设置悬停阴影 */
   transform: translateY(-2px);           /* 向上移动2px */
-  border-color: rgba(0, 0, 0, 0.12);    /* 边框颜色加深 */
+  border-color: var(--border-hover);     /* 使用CSS变量设置悬停边框颜色 */
 }
 
 /**
@@ -496,7 +575,7 @@ body {
 .word-text {
   font-size: 18px;                       /* 单词文字大小18px */
   font-weight: 600;                      /* 字体粗细600 */
-  color: #1a1a1a;                        /* 深黑色文字 */
+  color: var(--text-primary);            /* 使用CSS变量设置文字颜色 */
   letter-spacing: -0.3px;                /* 字间距-0.3px */
 }
 
@@ -508,7 +587,7 @@ body {
   background: rgba(102, 126, 234, 0.15); /* 蓝色半透明背景 */
   backdrop-filter: blur(10px);           /* 背景模糊 */
   -webkit-backdrop-filter: blur(10px);   /* Safari兼容 */
-  color: #667eea;                        /* 蓝色文字 */
+  color: var(--accent-primary);          /* 使用CSS变量设置文字颜色 */
   padding: 6px 14px;                     /* 内边距6px 14px */
   border-radius: 24px;                   /* 圆角24px */
   font-size: 12px;                       /* 字体大小12px */
@@ -524,13 +603,13 @@ body {
  * 显示单词类型的通用样式
  */
 .word-type {
-  padding: 5px 12px;                    /* 内边距5px 12px */
+  padding: 5px 12px;                     /* 内边距5px 12px */
   border-radius: 16px;                   /* 圆角16px */
   font-size: 11px;                       /* 字体大小11px */
   font-weight: 600;                      /* 字体粗细600 */
   white-space: nowrap;                   /* 不换行 */
-  border: 1px solid rgba(0, 0, 0, 0.08); /* 细边框 */
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); /* 小阴影 */
+  border: 1px solid var(--border-color); /* 使用CSS变量设置边框颜色 */
+  box-shadow: var(--shadow-sm);          /* 使用CSS变量设置阴影 */
 }
 
 /**
@@ -541,7 +620,7 @@ body {
   background: rgba(132, 250, 176, 0.3);  /* 绿色半透明背景 */
   backdrop-filter: blur(10px);           /* 背景模糊 */
   -webkit-backdrop-filter: blur(10px);   /* Safari兼容 */
-  color: #2c3e50;                        /* 深色文字 */
+  color: var(--text-primary);            /* 使用CSS变量设置文字颜色 */
 }
 
 /**
@@ -552,7 +631,7 @@ body {
   background: rgba(168, 237, 234, 0.3);  /* 青色半透明背景 */
   backdrop-filter: blur(10px);           /* 背景模糊 */
   -webkit-backdrop-filter: blur(10px);   /* Safari兼容 */
-  color: #2c3e50;                        /* 深色文字 */
+  color: var(--text-primary);            /* 使用CSS变量设置文字颜色 */
 }
 
 /**
@@ -563,7 +642,7 @@ body {
   background: rgba(255, 236, 210, 0.4);  /* 橙色半透明背景 */
   backdrop-filter: blur(10px);           /* 背景模糊 */
   -webkit-backdrop-filter: blur(10px);   /* Safari兼容 */
-  color: #2c3e50;                        /* 深色文字 */
+  color: var(--text-primary);            /* 使用CSS变量设置文字颜色 */
 }
 
 /**
@@ -571,18 +650,18 @@ body {
  * 显示单词翻译内容的文字样式
  */
 .translation-text {
-  color: #555;                           /* 灰色文字 */
+  color: var(--text-secondary);          /* 使用CSS变量设置文字颜色 */
   font-size: 14px;                       /* 字体大小14px */
   margin-bottom: 12px;                   /* 下边距12px */
   line-height: 1.6;                      /* 行高1.6 */
   font-weight: 500;                      /* 字体粗细500 */
   padding: 12px 16px;                    /* 内边距12px 16px */
-  background: rgba(255, 255, 255, 0.4);  /* 半透明白色背景 */
+  background: var(--bg-card);            /* 使用CSS变量设置背景 */
   backdrop-filter: blur(10px);           /* 背景模糊 */
   -webkit-backdrop-filter: blur(10px);   /* Safari兼容 */
   border-radius: 12px;                   /* 圆角12px */
-  border: 1px solid rgba(0, 0, 0, 0.05); /* 细边框 */
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05); /* 小阴影 */
+  border: 1px solid var(--border-color); /* 使用CSS变量设置边框颜色 */
+  box-shadow: var(--shadow-sm);          /* 使用CSS变量设置阴影 */
 }
 
 /**
@@ -594,9 +673,9 @@ body {
   justify-content: space-between;         /* 两端对齐 */
   align-items: center;                   /* 垂直居中 */
   font-size: 12px;                       /* 字体大小12px */
-  color: #888;                           /* 浅灰色文字 */
+  color: var(--text-tertiary);           /* 使用CSS变量设置文字颜色 */
   padding-top: 12px;                     /* 上内边距12px */
-  border-top: 1px solid rgba(0, 0, 0, 0.08); /* 顶部边框 */
+  border-top: 1px solid var(--border-color); /* 使用CSS变量设置边框颜色 */
   margin-top: 12px;                      /* 上外边距12px */
 }
 
@@ -615,7 +694,7 @@ body {
   font-size: 12px;                       /* 字体大小12px */
   font-weight: 600;                      /* 字体粗细600 */
   cursor: pointer;                       /* 鼠标指针为手型 */
-  transition: all 0.3s ease;             /* 过渡动画 */
+  transition: all var(--transition-normal); /* 使用CSS变量设置过渡动画 */
   box-shadow: 0 2px 8px rgba(255, 107, 107, 0.25); /* 红色阴影 */
 }
 
@@ -630,8 +709,367 @@ body {
 }
 
 /* ==================== */
-/* 滚动条样式 */
+/* 控制按钮组样式 */
 /* ==================== */
+
+.control-buttons {
+  display: flex;                         /* 弹性布局 */
+  gap: 8px;                              /* 按钮间距8px */
+  align-items: center;                   /* 垂直居中对齐 */
+}
+
+.import-btn, .export-btn, .settings-btn {
+  padding: 8px 12px;                     /* 内边距8px 12px */
+  background: var(--bg-card);            /* 使用CSS变量设置背景 */
+  backdrop-filter: blur(10px);           /* 背景模糊效果 */
+  -webkit-backdrop-filter: blur(10px);   /* Safari兼容 */
+  color: var(--text-primary);            /* 使用CSS变量设置文字颜色 */
+  border: 1px solid var(--border-color); /* 使用CSS变量设置边框 */
+  border-radius: 12px;                   /* 圆角12px */
+  font-size: 12px;                       /* 字体大小12px */
+  font-weight: 600;                      /* 字体粗细600 */
+  cursor: pointer;                       /* 鼠标指针为手型 */
+  transition: all var(--transition-normal); /* 使用CSS变量设置过渡动画 */
+  white-space: nowrap;                   /* 不换行 */
+  box-shadow: var(--shadow-sm);          /* 使用CSS变量设置阴影 */
+}
+
+.import-btn:hover, .export-btn:hover, .settings-btn:hover {
+  background: var(--bg-card-hover);      /* 使用CSS变量设置悬停背景 */
+  transform: translateY(-1px);           /* 向上移动1px */
+  box-shadow: var(--shadow-md);          /* 使用CSS变量设置悬停阴影 */
+  border-color: var(--border-hover);     /* 使用CSS变量设置悬停边框 */
+}
+
+/* ==================== */
+/* 设置页面样式 */
+/* ==================== */
+
+.settings-content {
+  padding: 20px;                           /* 内边距20px */
+  max-height: 500px;                       /* 最大高度500px */
+  overflow-y: auto;                        /* 垂直滚动 */
+}
+
+.settings-section {
+  margin-bottom: 30px;                     /* 下外边距30px */
+  padding: 20px;                           /* 内边距20px */
+  background: var(--bg-card);            /* 使用CSS变量设置背景 */
+  backdrop-filter: blur(10px);             /* 背景模糊效果 */
+  -webkit-backdrop-filter: blur(10px);     /* Safari兼容 */
+  border-radius: 16px;                     /* 圆角16px */
+  border: 1px solid var(--border-color); /* 使用CSS变量设置边框 */
+}
+
+.settings-section h3 {
+  margin-bottom: 20px;                   /* 下外边距20px */
+  color: var(--text-primary);            /* 使用CSS变量设置文字颜色 */
+  font-size: 16px;                       /* 字体大小16px */
+  font-weight: 600;                      /* 字体粗细600 */
+}
+
+.setting-item {
+  margin-bottom: 20px;                     /* 下外边距20px */
+  display: flex;                           /* 弹性布局 */
+  align-items: center;                     /* 垂直居中对齐 */
+  gap: 15px;                               /* 元素间距15px */
+}
+
+.setting-item label {
+  min-width: 120px;                        /* 最小宽度120px */
+  font-weight: 500;                        /* 字体粗细500 */
+  color: var(--text-primary);              /* 使用CSS变量设置文字颜色 */
+}
+
+.setting-item input[type="text"],
+.setting-item input[type="password"],
+.setting-item input[type="number"],
+.setting-item select {
+  flex: 1;                                 /* 占据剩余空间 */
+  padding: 10px 15px;                      /* 内边距10px 15px */
+  background: var(--bg-input);             /* 使用CSS变量设置背景 */
+  border: 1px solid var(--border-color);   /* 使用CSS变量设置边框 */
+  border-radius: 8px;                     /* 圆角8px */
+  font-size: 14px;                        /* 字体大小14px */
+  color: var(--text-primary);              /* 使用CSS变量设置文字颜色 */
+}
+
+.color-picker-group {
+  display: flex;                           /* 弹性布局 */
+  gap: 15px;                               /* 颜色选择器间距15px */
+  flex-wrap: wrap;                         /* 允许换行 */
+}
+
+.color-item {
+  display: flex;                           /* 弹性布局 */
+  align-items: center;                     /* 垂直居中对齐 */
+  gap: 8px;                                /* 元素间距8px */
+}
+
+.color-item input[type="color"] {
+  width: 40px;                             /* 宽度40px */
+  height: 30px;                            /* 高度30px */
+  border: none;                            /* 无边框 */
+  border-radius: 6px;                      /* 圆角6px */
+  cursor: pointer;                         /* 鼠标指针为手型 */
+}
+
+.settings-action-btn {
+  padding: 8px 16px;                     /* 内边距8px 16px */
+  background: rgba(108, 117, 125, 0.8);  /* 灰色半透明背景 */
+  color: white;                          /* 白色文字 */
+  border: none;                          /* 无边框 */
+  border-radius: 8px;                    /* 圆角8px */
+  font-size: 14px;                       /* 字体大小14px */
+  font-weight: 500;                      /* 字体粗细500 */
+  cursor: pointer;                         /* 鼠标指针为手型 */
+  transition: all 0.3s ease;             /* 过渡动画 */
+  margin-right: 10px;                    /* 右外边距10px */
+}
+
+.settings-action-btn:hover {
+  background: rgba(108, 117, 125, 0.95); /* 悬停时更不透明 */
+  transform: translateY(-1px);           /* 向上移动1px */
+}
+
+.reset-btn {
+  background: rgba(220, 53, 69, 0.8);    /* 红色半透明背景 */
+}
+
+.reset-btn:hover {
+  background: rgba(220, 53, 69, 0.95);   /* 悬停时更不透明 */
+}
+
+.settings-actions {
+  display: flex;                           /* 弹性布局 */
+  justify-content: flex-end;               /* 右对齐 */
+  gap: 15px;                               /* 按钮间距15px */
+  margin-top: 30px;                        /* 上外边距30px */
+  padding-top: 20px;                       /* 上内边距20px */
+  border-top: 1px solid rgba(0, 0, 0, 0.1); /* 顶部边框 */
+}
+
+.save-btn, .cancel-btn {
+  padding: 12px 24px;                      /* 内边距12px 24px */
+  border: none;                            /* 无边框 */
+  border-radius: 12px;                     /* 圆角12px */
+  font-size: 16px;                        /* 字体大小16px */
+  font-weight: 600;                       /* 字体粗细600 */
+  cursor: pointer;                          /* 鼠标指针为手型 */
+  transition: all 0.3s ease;              /* 过渡动画 */
+}
+
+.save-btn {
+  background: rgba(40, 167, 69, 0.8);      /* 绿色半透明背景 */
+  color: white;                            /* 白色文字 */
+}
+
+.save-btn:hover {
+  background: rgba(40, 167, 69, 0.95);   /* 悬停时更不透明 */
+  transform: translateY(-1px);           /* 向上移动1px */
+}
+
+.cancel-btn {
+  background: rgba(108, 117, 125, 0.8);  /* 灰色半透明背景 */
+  color: white;                            /* 白色文字 */
+}
+
+.cancel-btn:hover {
+  background: rgba(108, 117, 125, 0.95); /* 悬停时更不透明 */
+  transform: translateY(-1px);             /* 向上移动1px */
+}
+
+/* ==================== */
+/* 对话框样式 */
+/* ==================== */
+
+.dialog-overlay {
+  position: fixed;                           /* 固定定位 */
+  top: 0;                                  /* 顶部对齐 */
+  left: 0;                                 /* 左侧对齐 */
+  right: 0;                                /* 右侧对齐 */
+  bottom: 0;                               /* 底部对齐 */
+  background: rgba(0, 0, 0, 0.5);        /* 半透明黑色背景 */
+  backdrop-filter: blur(5px);             /* 背景模糊效果 */
+  -webkit-backdrop-filter: blur(5px);     /* Safari兼容 */
+  z-index: 1000;                           /* 最高层级 */
+  display: flex;                           /* 弹性布局 */
+  align-items: center;                     /* 垂直居中对齐 */
+  justify-content: center;                 /* 水平居中对齐 */
+}
+
+.dialog {
+  background: rgba(255, 255, 255, 0.9);   /* 半透明白色背景 */
+  backdrop-filter: blur(20px);              /* 背景模糊效果 */
+  -webkit-backdrop-filter: blur(20px);    /* Safari兼容 */
+  border-radius: 20px;                     /* 圆角20px */
+  border: 1px solid rgba(255, 255, 255, 0.3); /* 半透明边框 */
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2); /* 强烈阴影效果 */
+  min-width: 400px;                        /* 最小宽度400px */
+  max-width: 90vw;                         /* 最大宽度90%视口宽度 */
+  max-height: 80vh;                        /* 最大高度80%视口高度 */
+  overflow: hidden;                        /* 隐藏溢出内容 */
+}
+
+.dialog-header {
+  display: flex;                           /* 弹性布局 */
+  justify-content: space-between;          /* 两端对齐 */
+  align-items: center;                     /* 垂直居中对齐 */
+  padding: 20px;                           /* 内边距20px */
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1); /* 底部边框 */
+}
+
+.dialog-header h3 {
+  margin: 0;                               /* 无外边距 */
+  color: #2c3e50;                          /* 深蓝色文字 */
+  font-size: 18px;                         /* 字体大小18px */
+  font-weight: 600;                        /* 字体粗细600 */
+}
+
+.dialog-close {
+  background: none;                        /* 无背景 */
+  border: none;                            /* 无边框 */
+  font-size: 24px;                         /* 字体大小24px */
+  color: #999;                             /* 灰色文字 */
+  cursor: pointer;                         /* 鼠标指针为手型 */
+  padding: 0;                              /* 无内边距 */
+  width: 30px;                             /* 宽度30px */
+  height: 30px;                            /* 高度30px */
+  display: flex;                           /* 弹性布局 */
+  align-items: center;                     /* 垂直居中对齐 */
+  justify-content: center;                 /* 水平居中对齐 */
+  border-radius: 50%;                      /* 圆形按钮 */
+  transition: all 0.3s ease;               /* 过渡动画 */
+}
+
+.dialog-close:hover {
+  background: rgba(0, 0, 0, 0.1);        /* 悬停时浅色背景 */
+  color: #666;                             /* 悬停时深灰色文字 */
+}
+
+.dialog-content {
+  padding: 20px;                           /* 内边距20px */
+  max-height: 400px;                       /* 最大高度400px */
+  overflow-y: auto;                        /* 垂直滚动 */
+}
+
+.dialog-actions {
+  display: flex;                           /* 弹性布局 */
+  justify-content: flex-end;               /* 右对齐 */
+  gap: 15px;                               /* 按钮间距15px */
+  padding: 20px;                           /* 内边距20px */
+  border-top: 1px solid rgba(0, 0, 0, 0.1); /* 顶部边框 */
+}
+
+.confirm-btn, .cancel-btn {
+  padding: 10px 20px;                      /* 内边距10px 20px */
+  border: none;                            /* 无边框 */
+  border-radius: 12px;                     /* 圆角12px */
+  font-size: 14px;                         /* 字体大小14px */
+  font-weight: 600;                        /* 字体粗细600 */
+  cursor: pointer;                         /* 鼠标指针为手型 */
+  transition: all 0.3s ease;               /* 过渡动画 */
+}
+
+.confirm-btn {
+  background: rgba(40, 167, 69, 0.8);    /* 绿色半透明背景 */
+  color: white;                            /* 白色文字 */
+}
+
+.confirm-btn:hover:not(:disabled) {
+  background: rgba(40, 167, 69, 0.95);  /* 悬停时更不透明 */
+  transform: translateY(-1px);             /* 向上移动1px */
+}
+
+.confirm-btn:disabled {
+  background: rgba(108, 117, 125, 0.5);  /* 禁用时的灰色背景 */
+  color: rgba(255, 255, 255, 0.6);      /* 禁用时的浅色文字 */
+  cursor: not-allowed;                     /* 禁用鼠标样式 */
+}
+
+.cancel-btn {
+  background: rgba(108, 117, 125, 0.8);  /* 灰色半透明背景 */
+  color: white;                            /* 白色文字 */
+}
+
+.cancel-btn:hover {
+  background: rgba(108, 117, 125, 0.95);   /* 悬停时更不透明 */
+  transform: translateY(-1px);             /* 向上移动1px */
+}
+
+/* 导入导出选项 */
+.import-options, .export-options, .export-format {
+  margin-bottom: 20px;                     /* 下外边距20px */
+}
+
+.import-options label, .export-options label, .export-format label {
+  display: block;                          /* 块级元素 */
+  margin-bottom: 8px;                      /* 下外边距8px */
+  font-weight: 500;                        /* 字体粗细500 */
+  color: #34495e;                          /* 深灰色文字 */
+}
+
+.import-options select, .export-options select, .export-format select {
+  width: 100%;                             /* 宽度100% */
+  padding: 10px 15px;                      /* 内边距10px 15px */
+  background: rgba(255, 255, 255, 0.6);   /* 半透明白色背景 */
+  border: 1px solid rgba(0, 0, 0, 0.1);   /* 浅色边框 */
+  border-radius: 8px;                     /* 圆角8px */
+  font-size: 14px;                        /* 字体大小14px */
+}
+
+.file-upload {
+  margin-bottom: 20px;                     /* 下外边距20px */
+}
+
+.file-input {
+  display: none;                           /* 隐藏原文件输入 */
+}
+
+.file-label {
+  display: inline-block;                   /* 行内块级元素 */
+  padding: 12px 20px;                      /* 内边距12px 20px */
+  background: rgba(74, 144, 226, 0.8);   /* 蓝色半透明背景 */
+  color: white;                            /* 白色文字 */
+  border-radius: 12px;                     /* 圆角12px */
+  font-size: 14px;                         /* 字体大小14px */
+  font-weight: 500;                        /* 字体粗细500 */
+  cursor: pointer;                         /* 鼠标指针为手型 */
+  transition: all 0.3s ease;               /* 过渡动画 */
+  border: 1px solid rgba(255, 255, 255, 0.2); /* 半透明边框 */
+}
+
+.file-label:hover {
+  background: rgba(74, 144, 226, 0.95);  /* 悬停时更不透明 */
+  transform: translateY(-1px);             /* 向上移动1px */
+}
+
+.import-preview, .export-stats {
+  padding: 15px;                           /* 内边距15px */
+  background: rgba(255, 255, 255, 0.3);   /* 浅色半透明背景 */
+  border-radius: 12px;                     /* 圆角12px */
+  border: 1px solid rgba(255, 255, 255, 0.2); /* 半透明边框 */
+}
+
+.import-preview h4 {
+  margin-bottom: 10px;                     /* 下外边距10px */
+  color: #2c3e50;                          /* 深蓝色文字 */
+  font-size: 14px;                         /* 字体大小14px */
+  font-weight: 600;                        /* 字体粗细600 */
+}
+
+#previewContent {
+  max-height: 150px;                       /* 最大高度150px */
+  overflow-y: auto;                        /* 垂直滚动 */
+  font-size: 12px;                         /* 字体大小12px */
+  color: #34495e;                          /* 深灰色文字 */
+}
+
+.export-stats {
+  text-align: center;                      /* 文字居中 */
+  font-weight: 500;                        /* 字体粗细500 */
+  color: #34495e;                          /* 深灰色文字 */
+}
 
 .word-list::-webkit-scrollbar {
   width: 8px;                            /* 滚动条宽度8px */
@@ -676,15 +1114,15 @@ body {
  * 首页功能卡片的毛玻璃效果样式
  */
 .home-card {
-  background: rgba(255, 255, 255, 0.6);  /* 半透明白色背景 */
+  background: var(--bg-card);            /* 使用CSS变量设置背景 */
   backdrop-filter: blur(15px);           /* 背景模糊 */
   -webkit-backdrop-filter: blur(15px);   /* Safari兼容 */
-  border: 1px solid rgba(0, 0, 0, 0.08); /* 细边框 */
+  border: 1px solid var(--border-color); /* 使用CSS变量设置边框 */
   border-radius: 24px;                   /* 圆角24px */
   padding: 24px;                         /* 内边距24px */
   cursor: pointer;                       /* 鼠标指针为手型 */
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); /* 缓动过渡 */
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08); /* 阴影 */
+  box-shadow: var(--shadow-md);          /* 使用CSS变量设置阴影 */
   display: flex;                         /* 弹性布局 */
   flex-direction: column;                 /* 垂直排列 */
   align-items: center;                   /* 水平居中 */
@@ -707,10 +1145,10 @@ body {
 }
 
 .home-card:hover {
-  background: rgba(255, 255, 255, 0.75); /* 悬停时背景更亮 */
+  background: var(--bg-card-hover);      /* 使用CSS变量设置悬停背景 */
   transform: translateY(-4px);           /* 向上移动4px */
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12); /* 增强阴影 */
-  border-color: rgba(0, 0, 0, 0.12);    /* 边框颜色加深 */
+  box-shadow: var(--shadow-lg);          /* 使用CSS变量设置悬停阴影 */
+  border-color: var(--border-hover);     /* 使用CSS变量设置悬停边框 */
 }
 
 .home-card:hover::before {
@@ -744,7 +1182,7 @@ body {
 .card-title {
   font-size: 16px;                       /* 标题大小16px */
   font-weight: 600;                      /* 字体粗细600 */
-  color: #2c3e50;                        /* 深色文字 */
+  color: var(--text-primary);            /* 使用CSS变量设置文字颜色 */
   margin-bottom: 8px;                    /* 下边距8px */
   position: relative;                    /* 相对定位 */
   z-index: 1;                            /* 层级1 */
@@ -757,7 +1195,7 @@ body {
 .card-count {
   font-size: 24px;                       /* 计数大小24px */
   font-weight: 700;                      /* 字体粗细700 */
-  color: #9b59b6;                        /* 紫色文字 */
+  color: var(--accent-primary);          /* 使用CSS变量设置文字颜色 */
   position: relative;                    /* 相对定位 */
   z-index: 1;                            /* 层级1 */
 }
@@ -781,15 +1219,15 @@ body {
  * 单个统计卡片的毛玻璃效果样式
  */
 .stat-card {
-  background: rgba(255, 255, 255, 0.7);  /* 半透明白色背景 */
+  background: var(--bg-card);            /* 使用CSS变量设置背景 */
   backdrop-filter: blur(15px);           /* 背景模糊 */
   -webkit-backdrop-filter: blur(15px);   /* Safari兼容 */
-  border: 1px solid rgba(0, 0, 0, 0.08); /* 细边框 */
+  border: 1px solid var(--border-color); /* 使用CSS变量设置边框 */
   border-radius: 16px;                   /* 圆角16px */
   padding: 16px;                         /* 内边距16px */
   cursor: pointer;                       /* 鼠标指针为手型 */
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); /* 缓动过渡 */
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08); /* 阴影 */
+  box-shadow: var(--shadow-md);          /* 使用CSS变量设置阴影 */
   display: flex;                         /* 弹性布局 */
   flex-direction: column;                 /* 垂直排列 */
   align-items: center;                   /* 水平居中 */
@@ -797,15 +1235,26 @@ body {
   text-align: center;                    /* 文字居中 */
   position: relative;                    /* 相对定位 */
   overflow: hidden;                      /* 隐藏溢出 */
+  transform: translateY(0);              /* 初始位置 */
+  animation: cardFadeIn 0.6s ease-out;     /* 卡片淡入动画 */
 }
 
 /**
  * 统计卡片悬停效果
  */
 .stat-card:hover {
-  background: rgba(255, 255, 255, 0.85); /* 悬停时背景更亮 */
-  transform: translateY(-3px);           /* 向上移动3px */
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12); /* 增强阴影 */
+  background: var(--bg-card-hover);      /* 使用CSS变量设置悬停背景 */
+  transform: translateY(-8px) scale(1.02); /* 向上移动8px并轻微放大 */
+  box-shadow: var(--shadow-lg);          /* 使用CSS变量设置悬停阴影 */
+  border-color: var(--border-hover);     /* 使用CSS变量设置悬停边框 */
+}
+
+/**
+ * 统计卡片激活效果
+ */
+.stat-card:active {
+  transform: translateY(-4px) scale(1.01); /* 点击时轻微下压 */
+  transition: all 0.1s ease;              /* 快速过渡效果 */
 }
 
 /**
@@ -835,13 +1284,28 @@ body {
 }
 
 /**
+ * 卡片淡入动画
+ * 页面加载时卡片从下方淡入
+ */
+@keyframes cardFadeIn {
+  from {
+    opacity: 0;                           /* 初始透明 */
+    transform: translateY(30px);          /* 从下方30px开始 */
+  }
+  to {
+    opacity: 1;                           /* 最终完全不透明 */
+    transform: translateY(0);              /* 移动到正常位置 */
+  }
+}
+
+/**
  * 统计标题样式
  * 统计卡片的标题文字样式
  */
 .stat-title {
   font-size: 14px;                       /* 标题大小14px */
   font-weight: 600;                      /* 字体粗细600 */
-  color: #2c3e50;                        /* 深色文字 */
+  color: var(--text-primary);            /* 使用CSS变量设置文字颜色 */
   margin-bottom: 6px;                    /* 下边距6px */
   position: relative;                    /* 相对定位 */
   z-index: 1;                            /* 层级1 */
@@ -854,7 +1318,7 @@ body {
 .stat-count {
   font-size: 20px;                       /* 计数大小20px */
   font-weight: 700;                      /* 字体粗细700 */
-  color: #3498db;                        /* 蓝色文字 */
+  color: var(--accent-primary);          /* 使用CSS变量设置文字颜色 */
   position: relative;                    /* 相对定位 */
   z-index: 1;                            /* 层级1 */
 }
@@ -868,15 +1332,15 @@ body {
  * 右侧学习面板容器
  */
 .learning-panel {
-  background: rgba(255, 255, 255, 0.6);  /* 半透明白色背景 */
+  background: var(--bg-card);            /* 使用CSS变量设置背景 */
   backdrop-filter: blur(15px);           /* 背景模糊 */
   -webkit-backdrop-filter: blur(15px);   /* Safari兼容 */
-  border: 1px solid rgba(0, 0, 0, 0.08); /* 细边框 */
+  border: 1px solid var(--border-color); /* 使用CSS变量设置边框 */
   border-radius: 20px;                   /* 圆角20px */
   padding: 20px;                         /* 内边距20px */
   display: flex;                         /* 弹性布局 */
   flex-direction: column;                 /* 垂直排列 */
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08); /* 阴影 */
+  box-shadow: var(--shadow-md);          /* 使用CSS变量设置阴影 */
   overflow: hidden;                      /* 隐藏溢出 */
 }
 
@@ -886,13 +1350,13 @@ body {
 .learning-header {
   margin-bottom: 16px;                   /* 下边距16px */
   padding-bottom: 12px;                  /* 下内边距12px */
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08); /* 底部边框 */
+  border-bottom: 1px solid var(--border-color); /* 使用CSS变量设置底部边框 */
 }
 
 .learning-header h3 {
   font-size: 18px;                       /* 标题大小18px */
   font-weight: 600;                      /* 字体粗细600 */
-  color: #2c3e50;                        /* 深色文字 */
+  color: var(--text-primary);            /* 使用CSS变量设置文字颜色 */
   margin: 0;                             /* 移除默认外边距 */
 }
 
@@ -1058,5 +1522,347 @@ body {
   font-weight: 500;                      /* 字体粗细500 */
   color: #666;                           /* 灰色文字 */
   white-space: nowrap;                   /* 不换行 */
+}
+
+/* ==================== */
+/* 学习模式样式 */
+/* ==================== */
+
+.learning-stats {
+  font-size: 14px;
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.learning-content {
+  padding: 20px;
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+.learning-modes {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 30px;
+  justify-content: center;
+}
+
+.mode-btn {
+  padding: 12px 20px;
+  background: rgba(255, 255, 255, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.mode-btn:hover {
+  background: rgba(255, 255, 255, 0.6);
+  transform: translateY(-1px);
+}
+
+.mode-btn.active {
+  background: rgba(74, 144, 226, 0.8);
+  color: white;
+  border-color: rgba(74, 144, 226, 0.3);
+}
+
+.learning-area {
+  margin-bottom: 20px;
+}
+
+/* 闪卡模式 */
+.flashcard-mode, .quiz-mode, .spelling-mode {
+  display: none;
+}
+
+.flashcard-mode.active, .quiz-mode.active, .spelling-mode.active {
+  display: block;
+}
+
+.flashcard {
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 20px;
+  padding: 30px;
+  margin-bottom: 20px;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  min-height: 200px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.flashcard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+}
+
+.word-display {
+  font-size: 28px;
+  font-weight: 700;
+  color: #2c3e50;
+  margin-bottom: 10px;
+}
+
+.phonetic-display {
+  font-size: 16px;
+  color: #7f8c8d;
+  margin-bottom: 8px;
+  font-style: italic;
+}
+
+.part-of-speech {
+  font-size: 14px;
+  color: #95a5a6;
+  font-weight: 500;
+}
+
+.translation-display {
+  font-size: 24px;
+  color: #27ae60;
+  font-weight: 600;
+  margin-bottom: 15px;
+}
+
+.word-examples {
+  font-size: 14px;
+  color: #7f8c8d;
+  font-style: italic;
+}
+
+.card-controls {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+}
+
+.control-btn {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.flip-btn {
+  background: rgba(74, 144, 226, 0.8);
+  color: white;
+}
+
+.difficulty-btn[data-difficulty="hard"] {
+  background: rgba(231, 76, 60, 0.8);
+  color: white;
+}
+
+.difficulty-btn[data-difficulty="easy"] {
+  background: rgba(39, 174, 96, 0.8);
+  color: white;
+}
+
+.control-btn:hover {
+  transform: translateY(-1px);
+  opacity: 0.9;
+}
+
+/* 测验模式 */
+.quiz-question {
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 20px;
+  padding: 30px;
+  margin-bottom: 20px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.question-text {
+  font-size: 20px;
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.quiz-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.quiz-option {
+  padding: 15px;
+  background: rgba(255, 255, 255, 0.6);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 12px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: center;
+}
+
+.quiz-option:hover {
+  background: rgba(255, 255, 255, 0.8);
+  border-color: rgba(74, 144, 226, 0.5);
+}
+
+.quiz-option.correct {
+  background: rgba(39, 174, 96, 0.8);
+  color: white;
+  border-color: rgba(39, 174, 96, 0.3);
+}
+
+.quiz-option.incorrect {
+  background: rgba(231, 76, 60, 0.8);
+  color: white;
+  border-color: rgba(231, 76, 60, 0.3);
+}
+
+.quiz-result {
+  text-align: center;
+  padding: 20px;
+}
+
+.result-icon {
+  font-size: 48px;
+  margin-bottom: 10px;
+}
+
+.result-text {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+
+/* 拼写模式 */
+.spelling-question {
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 20px;
+  padding: 30px;
+  margin-bottom: 20px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.spelling-prompt {
+  font-size: 20px;
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.spelling-input-area {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.spelling-input {
+  flex: 1;
+  padding: 15px;
+  background: rgba(255, 255, 255, 0.6);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 12px;
+  font-size: 16px;
+  outline: none;
+}
+
+.spelling-input:focus {
+  border-color: rgba(74, 144, 226, 0.5);
+  background: rgba(255, 255, 255, 0.8);
+}
+
+.submit-btn {
+  background: rgba(74, 144, 226, 0.8);
+  color: white;
+  padding: 15px 30px;
+}
+
+.spelling-result {
+  text-align: center;
+}
+
+.spelling-feedback {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.correct-spelling {
+  font-size: 16px;
+  color: #27ae60;
+  font-weight: 600;
+}
+
+/* 学习总结 */
+.learning-summary {
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 20px;
+  padding: 30px;
+  text-align: center;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.summary-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #2c3e50;
+  margin-bottom: 20px;
+}
+
+.summary-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.stat-item {
+  background: rgba(255, 255, 255, 0.6);
+  padding: 15px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.stat-label {
+  font-size: 14px;
+  color: #7f8c8d;
+  display: block;
+  margin-bottom: 5px;
+}
+
+.stat-value {
+  font-size: 20px;
+  font-weight: 700;
+  color: #2c3e50;
+}
+
+.summary-actions {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+}
+
+.next-btn {
+  background: rgba(74, 144, 226, 0.8);
+  color: white;
 }
 
