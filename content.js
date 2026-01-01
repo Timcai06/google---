@@ -9,17 +9,30 @@
  * 5. 与后台服务进程通信获取翻译结果
  */
 
-// ====================
-// 配置常量定义
-// ====================
+// ====================  
+// 配置常量定义  
+// ====================  
+
+// 允许运行插件的域名列表
+const ALLOWED_DOMAINS = [
+  'wikipedia.org',
+  'zhihu.com',
+  'blog.csdn.net',
+  'medium.com',
+  'dev.to',
+  'stackoverflow.com',
+  'github.io',
+  'gitbook.io',
+  'notion.site'
+];
 
 // 翻译API配置 - 使用免费的翻译服务作为备用方案
 const TRANSLATE_API = 'https://api.mymemory.translated.net/get';
 // 音标API配置 - 使用免费的字典服务获取单词音标和词性
 const DICTIONARY_API = 'https://api.dictionaryapi.dev/api/v2/entries/en/';
 
-// ====================
-// 全局变量定义
+// ====================  
+// 全局变量定义  
 // ====================
 
 // 存储用户选中的文本内容
@@ -50,13 +63,33 @@ let highlightDebounceTimer = null;
 let selectionDebounceTimer = null;
 
 /**
+ * 检查当前域名是否允许运行插件
+ * @returns {boolean} 是否允许运行插件
+ */
+function isDomainAllowed() {
+  const hostname = window.location.hostname;
+  // 检查当前域名是否在允许列表中
+  return ALLOWED_DOMAINS.some(domain => hostname.endsWith(domain));
+}
+
+/**
  * 初始化高亮功能
  * 页面加载时自动加载已翻译的单词并进行高亮显示
  */
 async function initHighlighting() {
-  // 从Chrome本地存储中获取已翻译的单词数据
-  const result = await chrome.storage.local.get(['translatedWords']);
+  // 检查当前域名是否允许运行插件
+  if (!isDomainAllowed()) {
+    console.log('单词翻译助手: 当前域名不允许运行插件');
+    return;
+  }
+  
+  // 从Chrome本地存储中获取已翻译的单词数据和用户设置
+  const result = await chrome.storage.local.get(['translatedWords', 'userSettings']);
   const words = result.translatedWords || {};
+  const settings = result.userSettings || {};
+
+  // 应用自定义颜色设置
+  applyCustomColors(settings);
 
   // 对已翻译的单词进行高亮显示
   highlightTranslatedWords(words);
@@ -69,6 +102,11 @@ async function initHighlighting() {
  * @param {Object} words - 已翻译的单词对象，键为单词，值为翻译数据
  */
 function highlightTranslatedWords(words) {
+  // 检查当前域名是否允许运行插件
+  if (!isDomainAllowed()) {
+    return;
+  }
+  
   const body = document.body;
   if (!body) return;
 
@@ -82,10 +120,14 @@ function highlightTranslatedWords(words) {
   });
 
   // 只处理单词和词组类型的翻译记录
-  const wordKeys = Object.keys(words).filter(word => {
+  let wordKeys = Object.keys(words).filter(word => {
     const wordData = words[word];
     return wordData.type === 'word' || wordData.type === 'phrase';
   });
+
+  // 限制高亮的单词数量，避免过多DOM操作
+  const MAX_HIGHLIGHTS = 50; // 每个页面最多高亮50个单词
+  wordKeys = wordKeys.slice(0, MAX_HIGHLIGHTS);
 
   // 为每个已翻译的单词创建高亮显示
   wordKeys.forEach(word => {
@@ -96,64 +138,84 @@ function highlightTranslatedWords(words) {
     // 创建区分大小写的正则表达式，用于精确匹配单词边界
     const regex = new RegExp(`\\b${escapeRegExp(wordLower)}\\b`, 'gi');
 
-    // 遍历页面中的所有文本节点
-    walkTextNodes(body, (node) => {
-      // 跳过已经高亮的节点或其父节点，避免重复处理
-      if (node.parentElement && node.parentElement.classList.contains('translated-word-highlight')) {
-        return;
-      }
+    // 获取主要内容区域，避免在整个页面进行遍历
+    const contentAreas = [
+      document.querySelector('main'),
+      document.querySelector('article'),
+      document.querySelector('.article-content'),
+      document.querySelector('.post-content'),
+      document.querySelector('.content'),
+      document.querySelector('.entry-content'),
+      document.querySelector('#content'),
+      document.body // 作为最后的备选
+    ].filter(Boolean);
 
-      // 跳过高亮元素内部的文本节点
-      let parent = node.parentElement;
-      while (parent && parent !== body) {
-        if (parent.classList && parent.classList.contains('translated-word-highlight')) {
+    // 只在主要内容区域进行遍历
+    contentAreas.forEach(contentArea => {
+      // 遍历页面中的所有文本节点
+      walkTextNodes(contentArea, (node) => {
+        // 跳过已经高亮的节点或其父节点，避免重复处理
+        if (node.parentElement && node.parentElement.classList.contains('translated-word-highlight')) {
           return;
         }
-        parent = parent.parentElement;
-      }
 
-      // 处理文本节点中的单词匹配
-      if (node.nodeType === Node.TEXT_NODE && node.textContent.match(regex)) {
-        const fragment = document.createDocumentFragment();
-        let lastIndex = 0;
-        let match;
-        const text = node.textContent;
-
-        // 循环处理所有匹配的单词
-        while ((match = regex.exec(text)) !== null) {
-          // 添加匹配前的文本
-          if (match.index > lastIndex) {
-            fragment.appendChild(document.createTextNode(text.substring(lastIndex, match.index)));
+        // 跳过高亮元素内部的文本节点
+        let parent = node.parentElement;
+        while (parent && parent !== contentArea) {
+          if (parent.classList && parent.classList.contains('translated-word-highlight')) {
+            return;
           }
-
-          // 创建高亮显示的span元素
-          const highlight = document.createElement('span');
-          highlight.className = `translated-word-highlight ${posClass}`;
-          highlight.textContent = match[0];
-          // 存储单词相关数据作为元素属性
-          highlight.dataset.word = wordLower;
-          highlight.dataset.translation = words[word].translation;
-          highlight.dataset.count = words[word].count;
-          if (wordData.partOfSpeech) {
-            highlight.dataset.partOfSpeech = wordData.partOfSpeech;
-          }
-
-          // 为高亮元素添加点击事件监听器
-          highlight.addEventListener('click', handleHighlightClick);
-
-          fragment.appendChild(highlight);
-
-          lastIndex = regex.lastIndex;
+          parent = parent.parentElement;
         }
 
-        // 添加剩余的文本内容
-        if (lastIndex < text.length) {
-          fragment.appendChild(document.createTextNode(text.substring(lastIndex)));
+        // 跳过脚本、样式、iframe等非文本内容
+        if (node.parentElement && ['SCRIPT', 'STYLE', 'IFRAME', 'SVG', 'CANVAS', 'VIDEO', 'AUDIO'].includes(node.parentElement.tagName)) {
+          return;
         }
 
-        // 用处理后的片段替换原始文本节点
-        node.parentNode.replaceChild(fragment, node);
-      }
+        // 处理文本节点中的单词匹配
+        if (node.nodeType === Node.TEXT_NODE && node.textContent.match(regex)) {
+          const fragment = document.createDocumentFragment();
+          let lastIndex = 0;
+          let match;
+          const text = node.textContent;
+
+          // 循环处理所有匹配的单词
+          while ((match = regex.exec(text)) !== null) {
+            // 添加匹配前的文本
+            if (match.index > lastIndex) {
+              fragment.appendChild(document.createTextNode(text.substring(lastIndex, match.index)));
+            }
+
+            // 创建高亮显示的span元素
+            const highlight = document.createElement('span');
+            highlight.className = `translated-word-highlight ${posClass}`;
+            highlight.textContent = match[0];
+            // 存储单词相关数据作为元素属性
+            highlight.dataset.word = wordLower;
+            highlight.dataset.translation = words[word].translation;
+            highlight.dataset.count = words[word].count;
+            if (wordData.partOfSpeech) {
+              highlight.dataset.partOfSpeech = wordData.partOfSpeech;
+            }
+
+            // 移除旧的事件监听器，改为使用事件委托
+          // highlight.addEventListener('click', handleHighlightClick);
+
+            fragment.appendChild(highlight);
+
+            lastIndex = regex.lastIndex;
+          }
+
+          // 添加剩余的文本内容
+          if (lastIndex < text.length) {
+            fragment.appendChild(document.createTextNode(text.substring(lastIndex)));
+          }
+
+          // 用处理后的片段替换原始文本节点
+          node.parentNode.replaceChild(fragment, node);
+        }
+      });
     });
   });
 }
@@ -731,6 +793,11 @@ function getPlainTextFromSelection(selection) {
 
 // 处理文本选择（保存选择，等待回车键）
 function handleTextSelection() {
+  // 检查当前域名是否允许运行插件
+  if (!isDomainAllowed()) {
+    return;
+  }
+  
   const selection = window.getSelection();
   const text = selection.toString().trim();
   
@@ -781,6 +848,11 @@ function handleTextSelection() {
 
 // 执行翻译（按回车键后调用）
 async function executeTranslation() {
+  // 检查当前域名是否允许运行插件
+  if (!isDomainAllowed()) {
+    return;
+  }
+  
   if (!selectedText || !selectedRange) {
     return;
   }
@@ -826,6 +898,11 @@ async function executeTranslation() {
 
 // 监听鼠标抬起事件（完成选择）
 document.addEventListener('mouseup', async (e) => {
+  // 检查当前域名是否允许运行插件
+  if (!isDomainAllowed()) {
+    return;
+  }
+  
   // 清除之前的定时器
   if (selectionDebounceTimer) {
     clearTimeout(selectionDebounceTimer);
@@ -842,6 +919,11 @@ document.addEventListener('mouseup', async (e) => {
 
 // 监听键盘事件（回车键触发翻译）
 document.addEventListener('keydown', async (e) => {
+  // 检查当前域名是否允许运行插件
+  if (!isDomainAllowed()) {
+    return;
+  }
+  
   // 检查是否按下了回车键
   if (e.key === 'Enter' && selectedText && selectedRange) {
     // 检查是否有输入框或文本区域处于焦点状态
@@ -865,6 +947,124 @@ document.addEventListener('keydown', async (e) => {
     selection.removeAllRanges();
     selectedText = '';
     selectedRange = null;
+  }
+});
+
+/**
+ * 应用自定义颜色设置
+ * 根据用户设置动态生成和应用CSS样式
+ * @param {Object} settings - 用户设置对象
+ */
+function applyCustomColors(settings) {
+  // 移除现有的自定义样式
+  const existingStyle = document.getElementById('custom-highlight-colors');
+  if (existingStyle) {
+    existingStyle.remove();
+  }
+
+  // 如果用户选择了自定义主题，应用自定义颜色
+  if (settings.highlightTheme === 'custom' && settings.customColors) {
+    const style = document.createElement('style');
+    style.id = 'custom-highlight-colors';
+    
+    let cssContent = '';
+    
+    // 为每个词性生成自定义颜色
+    Object.entries(settings.customColors).forEach(([pos, color]) => {
+      const className = pos === 'default' ? '' : `.pos-${pos}`;
+      cssContent += `
+        .translated-word-highlight${className} {
+          background: ${color} !important;
+          background: linear-gradient(135deg, ${color} 0%, ${adjustBrightness(color, -20)} 100%) !important;
+        }
+        .translated-word-highlight${className}:hover {
+          background: linear-gradient(135deg, ${adjustBrightness(color, 10)} 0%, ${color} 100%) !important;
+          filter: brightness(1.1) !important;
+        }
+        .click-tooltip${className} {
+          background: linear-gradient(135deg, ${color} 0%, ${adjustBrightness(color, -20)} 100%) !important;
+        }
+      `;
+    });
+    
+    style.textContent = cssContent;
+    document.head.appendChild(style);
+  }
+}
+
+/**
+ * 调整颜色亮度
+ * @param {string} color - 颜色值（支持hex、rgb、颜色名称）
+ * @param {number} percent - 亮度调整百分比（正值变亮，负值变暗）
+ * @returns {string} 调整后的颜色
+ */
+function adjustBrightness(color, percent) {
+  // 简化的亮度调整函数
+  const rgb = colorToRgb(color);
+  if (!rgb) return color;
+  
+  const factor = 1 + percent / 100;
+  const r = Math.min(255, Math.max(0, Math.round(rgb.r * factor)));
+  const g = Math.min(255, Math.max(0, Math.round(rgb.g * factor)));
+  const b = Math.min(255, Math.max(0, Math.round(rgb.b * factor)));
+  
+  return `rgb(${r}, ${g}, ${b})`;
+}
+
+/**
+ * 颜色转换为RGB对象
+ * @param {string} color - 颜色字符串
+ * @returns {Object|null} RGB对象或null
+ */
+function colorToRgb(color) {
+  // 处理十六进制颜色
+  if (color.startsWith('#')) {
+    const hex = color.slice(1);
+    const num = parseInt(hex, 16);
+    return {
+      r: (num >> 16) & 255,
+      g: (num >> 8) & 255,
+      b: num & 255
+    };
+  }
+  
+  // 处理rgb颜色
+  const rgbMatch = color.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/);
+  if (rgbMatch) {
+    return {
+      r: parseInt(rgbMatch[1]),
+      g: parseInt(rgbMatch[2]),
+      b: parseInt(rgbMatch[3])
+    };
+  }
+  
+  return null;
+}
+
+// 监听设置变化，实时更新颜色
+chrome.storage.onChanged.addListener((changes, areaName) => {
+  if (areaName === 'local' && changes.userSettings) {
+    // 重新应用颜色设置
+    applyCustomColors(changes.userSettings.newValue || {});
+    // 重新高亮显示以应用新颜色
+    chrome.storage.local.get(['translatedWords']).then(result => {
+      const words = result.translatedWords || {};
+      highlightTranslatedWords(words);
+    });
+  }
+});
+
+// 使用事件委托处理所有高亮元素的点击事件
+document.addEventListener('click', async (e) => {
+  // 检查当前域名是否允许运行插件
+  if (!isDomainAllowed()) {
+    return;
+  }
+  
+  // 检查点击的是否是高亮元素
+  const highlight = e.target.closest('.translated-word-highlight');
+  if (highlight) {
+    await handleHighlightClick(e);
   }
 });
 
