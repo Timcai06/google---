@@ -17,11 +17,26 @@ chrome.runtime.onInstalled.addListener(() => {
 // 网易有道翻译/词典 API 集成模块
 // =========================
 
-// TODO: 将下面两个占位字符串替换为你在有道开放平台申请的 appKey 和 appSecret
-// 有道翻译API的应用密钥 - 用于身份验证
-const YOUDAO_APP_KEY = '73a29bc0304b261d';
-// 有道翻译API的应用密钥 - 用于生成签名
-const YOUDAO_APP_SECRET = 'cek7XucQ5ggaDqXDCMYEVXs0FiZTHueX';
+// 获取用户配置的API密钥
+async function getYoudaoCredentials() {
+  try {
+    const result = await chrome.storage.local.get(['userSettings']);
+    const settings = result.userSettings || {};
+    
+    // 优先使用用户配置的API密钥
+    const appKey = settings.apiKey || '73a29bc0304b261d';
+    const appSecret = settings.apiSecret || 'cek7XucQ5ggaDqXDCMYEVXs0FiZTHueX';
+    
+    return { appKey, appSecret };
+  } catch (error) {
+    console.error('获取API配置失败:', error);
+    // 回退到默认密钥
+    return { 
+      appKey: '73a29bc0304b261d', 
+      appSecret: 'cek7XucQ5ggaDqXDCMYEVXs0FiZTHueX' 
+    };
+  }
+}
 
 /**
  * 生成有道API签名所需的截断函数
@@ -60,9 +75,12 @@ async function sha256Hex(message) {
  * @throws {Error} 当API配置错误或翻译失败时抛出异常
  */
 async function translateWithYoudao(text) {
+  // 获取用户配置的API密钥
+  const credentials = await getYoudaoCredentials();
+  
   // 检查API密钥是否正确配置
-  if (!YOUDAO_APP_KEY || !YOUDAO_APP_SECRET || YOUDAO_APP_KEY === 'Y73a29bc0304b261d') {
-    throw new Error('Youdao appKey/appSecret 未配置');
+  if (!credentials.appKey || !credentials.appSecret || credentials.appKey === '73a29bc0304b261d') {
+    throw new Error('Youdao appKey/appSecret 未配置，请在扩展设置中配置您的API密钥');
   }
 
   // API请求基础配置
@@ -74,7 +92,7 @@ async function translateWithYoudao(text) {
   const curtime = Math.floor(Date.now() / 1000).toString(); // 当前时间戳
 
   // 生成API签名字符串
-  const signStr = YOUDAO_APP_KEY + truncate(q) + salt + curtime + YOUDAO_APP_SECRET;
+  const signStr = credentials.appKey + truncate(q) + salt + curtime + credentials.appSecret;
   const sign = await sha256Hex(signStr); // 计算SHA-256签名
 
   // 构建请求参数
@@ -82,7 +100,7 @@ async function translateWithYoudao(text) {
     q,                    // 查询文本
     from,                 // 源语言
     to,                   // 目标语言
-    appKey: YOUDAO_APP_KEY, // 应用密钥
+    appKey: credentials.appKey, // 应用密钥
     salt,                 // 盐值
     sign,                 // 签名
     signType: 'v3',       // 签名类型
